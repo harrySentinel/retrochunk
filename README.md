@@ -1,8 +1,8 @@
 # RetroChunk
 
-> A pixel-art React component library with hard shadows, crunchy borders, canvas mascots, and CRT vibes.
+> Pixel UI for React — buttons to dashboards, plus living mascots.
 
-Built with **Next.js 16**, **Tailwind CSS v4**, and **TypeScript**.
+Hard shadows, crunchy borders, canvas creatures, and CRT vibes. Built with **Next.js 16**, **Tailwind CSS v4**, and **TypeScript**.
 
 ![RetroChunk](https://img.shields.io/badge/version-0.1.0-FFB020?style=flat-square)
 ![Next.js](https://img.shields.io/badge/Next.js-16-000?style=flat-square)
@@ -15,7 +15,7 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to see the showcase site.
+Open [http://localhost:3000](http://localhost:3000) for the gallery, or [http://localhost:3000/playground](http://localhost:3000/playground) to compose login / settings / empty states.
 
 ## Project Structure
 
@@ -26,28 +26,20 @@ src/
     globals.css            # @theme tokens + keyframes
     page.tsx               # Showcase landing page
     landing-page.tsx       # Hero + gallery + live demos
+    playground/page.tsx    # Compose real pixel screens
     docs/[slug]/page.tsx   # Per-component docs with live preview
   components/
-    ui/                    # Primitives
-      pixel-button.tsx     # Button with press effect
-      pixel-card.tsx       # Card with hard shadow
-      pixel-badge.tsx      # Inline badge/label
-      pixel-window.tsx     # Retro OS window panel
-      pixel-loader.tsx     # 4×4 grid diagonal-wave loader
-      code-block.tsx       # Code block with copy button
-    mascot/                # Canvas-based creatures
-      pixel-creature.tsx   # Sprite grid renderer
-      creature-helpers.ts  # patch() + shift() utilities
-      creature-presets.ts  # Demo mascot + animation presets
-      mascot.tsx           # High-level mascot with interactions
+    ui/                    # Primitives (button, input, card, …)
+    mascot/                # Canvas creatures + emotions
     blocks/                # Composed sections
-      hero-pixel.tsx       # Hero section with mascot
-      testimonials-pixel.tsx # Marquee testimonial wall
-      dashboard-pixel.tsx  # Pixel dashboard demo
   lib/
-    cn.ts                  # clsx + tailwind-merge
-    component-docs.ts      # Documentation data
+    cn.ts
+    component-docs.ts
+packages/
+  react/                   # Future @retrochunk/react publish surface
 ```
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) to add components.
 
 ## Theme Tokens
 

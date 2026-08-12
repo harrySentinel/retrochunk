@@ -5,8 +5,10 @@ import { PixelCreature } from './pixel-creature';
 import { MASCOT_PALETTE, MASCOT_BASE, MASCOT_FRAMES } from './creature-presets';
 import { cn } from '@/lib/cn';
 
+export type MascotAnimation = 'idle' | 'blink' | 'wave' | 'celebrate' | 'error';
+
 export interface MascotProps {
-  animation?: 'idle' | 'blink' | 'wave' | 'celebrate';
+  animation?: MascotAnimation;
   size?: number;
   className?: string;
 }
@@ -16,53 +18,84 @@ export function Mascot({
   size = 8,
   className,
 }: MascotProps) {
-  const [currentAnim, setCurrentAnim] = React.useState(animation);
-  const isHovered = React.useRef(false);
+  const [currentAnim, setCurrentAnim] = React.useState<MascotAnimation>(animation);
+  const interacting = React.useRef(false);
+  const resetTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearResetTimer = () => {
+    if (resetTimer.current) {
+      clearTimeout(resetTimer.current);
+      resetTimer.current = null;
+    }
+  };
 
   React.useEffect(() => {
-    if (!isHovered.current) {
+    if (!interacting.current) {
       setCurrentAnim(animation);
     }
   }, [animation]);
 
   React.useEffect(() => {
-    if (isHovered.current) return;
+    if (interacting.current) return;
 
     if (animation === 'idle') {
       const interval = setInterval(() => {
-        if (!isHovered.current) {
+        if (!interacting.current) {
           setCurrentAnim('blink');
           setTimeout(() => {
-            if (!isHovered.current) setCurrentAnim('idle');
-          }, 1000); // Back to idle
+            if (!interacting.current) setCurrentAnim('idle');
+          }, 1000);
         }
       }, 5000);
       return () => clearInterval(interval);
     }
   }, [animation]);
 
+  React.useEffect(() => () => clearResetTimer(), []);
+
+  const playTemp = (next: MascotAnimation, ms = 1800) => {
+    interacting.current = true;
+    setCurrentAnim(next);
+    clearResetTimer();
+    resetTimer.current = setTimeout(() => {
+      interacting.current = false;
+      setCurrentAnim(animation);
+    }, ms);
+  };
+
   const frames = MASCOT_FRAMES[currentAnim];
 
   return (
-    <div 
-      className={cn('inline-block cursor-pointer transition-transform active:translate-y-[2px] max-w-full', className)}
+    <div
+      role="img"
+      aria-label={`RetroChunk mascot (${currentAnim})`}
+      className={cn(
+        'inline-block cursor-pointer touch-manipulation transition-transform active:translate-y-[2px] max-w-full select-none',
+        className
+      )}
       onMouseEnter={() => {
-        isHovered.current = true;
+        if (animation === 'error') return;
+        interacting.current = true;
         setCurrentAnim('wave');
       }}
       onMouseLeave={() => {
-        isHovered.current = false;
+        interacting.current = false;
+        clearResetTimer();
         setCurrentAnim(animation);
       }}
       onClick={() => {
-        setCurrentAnim(currentAnim === 'wave' ? animation : 'wave');
+        if (animation === 'error') {
+          playTemp('celebrate');
+          return;
+        }
+        playTemp(currentAnim === 'celebrate' ? 'wave' : 'celebrate');
       }}
-      onTouchStart={() => {
-        setCurrentAnim('wave');
-        setTimeout(() => setCurrentAnim(animation), 2000);
+      onTouchStart={(e) => {
+        e.preventDefault();
+        playTemp(animation === 'error' ? 'wave' : 'celebrate');
       }}
     >
-      <PixelCreature 
+      <PixelCreature
         base={MASCOT_BASE}
         palette={MASCOT_PALETTE}
         frames={frames}

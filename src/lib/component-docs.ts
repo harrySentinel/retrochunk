@@ -129,6 +129,26 @@ export const componentDocs: ComponentDoc[] = [
 <PixelLoader size="lg" />`,
   },
   {
+    slug: "pixel-input",
+    name: "PixelInput",
+    description:
+      "A crunchy text input with hard shadow focus ring, optional label, hint, and error state for forms.",
+    category: "primitive",
+    props: [
+      { name: "label", type: "string", description: "Optional field label." },
+      { name: "hint", type: "string", description: "Helper text under the input." },
+      { name: "error", type: "string", description: "Error message; switches border to danger." },
+      { name: "placeholder", type: "string", description: "Placeholder text." },
+      { name: "disabled", type: "boolean", default: "false", description: "Disables the input." },
+      { name: "className", type: "string", description: "Additional CSS classes." },
+    ],
+    code: `import { PixelInput } from "@/components/ui";
+
+<PixelInput label="PLAYER" placeholder="enter name..." />
+<PixelInput label="EMAIL" hint="We never share this." />
+<PixelInput label="CODE" error="Invalid invite code." />`,
+  },
+  {
     slug: "pixel-creature",
     name: "PixelCreature",
     description:
@@ -166,10 +186,10 @@ const palette = [
     slug: "mascot",
     name: "Mascot",
     description:
-      "The RetroChunk mascot — a friendly pixel creature that idles, blinks, and waves on hover.",
+      "The RetroChunk mascot — idles, blinks, waves, celebrates, and shows an error mood. Works with hover and tap.",
     category: "mascot",
     props: [
-      { name: "animation", type: "'idle' | 'blink' | 'wave' | 'celebrate'", default: "'idle'", description: "Animation preset." },
+      { name: "animation", type: "'idle' | 'blink' | 'wave' | 'celebrate' | 'error'", default: "'idle'", description: "Animation / emotion preset." },
       { name: "size", type: "number", default: "8", description: "Pixel size of each cell." },
       { name: "className", type: "string", description: "Additional CSS classes." },
     ],
@@ -177,7 +197,8 @@ const palette = [
 
 <Mascot animation="idle" size={8} />
 <Mascot animation="wave" size={10} />
-<Mascot animation="celebrate" size={12} />`,
+<Mascot animation="celebrate" size={12} />
+<Mascot animation="error" size={10} />`,
   },
   {
     slug: "hero-pixel",

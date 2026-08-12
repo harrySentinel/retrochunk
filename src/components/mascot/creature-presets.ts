@@ -52,9 +52,19 @@ const MASCOT_CELEBRATE_SPARKLES = patch(MASCOT_CELEBRATE_1, [
   [1, 0, 3], [3, 11, 3], [10, 0, 3], // yellow sparkles
 ]);
 
-export const MASCOT_FRAMES: Record<'idle' | 'blink' | 'wave' | 'celebrate', number[][][]> = {
+const MASCOT_ERROR = patch(MASCOT_BASE, [
+  [2, 2, 6], [2, 3, 6], [2, 4, 6], [2, 5, 6], [2, 6, 6], [2, 7, 6], [2, 8, 6], [2, 9, 6],
+  [3, 3, 1], [3, 7, 1],
+  [3, 4, 6], [3, 6, 6],
+  [5, 4, 1], [5, 5, 1], [5, 6, 1], [5, 7, 1],
+]);
+
+const MASCOT_ERROR_SHAKE = shift(MASCOT_ERROR, 0, 1);
+
+export const MASCOT_FRAMES: Record<'idle' | 'blink' | 'wave' | 'celebrate' | 'error', number[][][]> = {
   idle: [MASCOT_BASE, MASCOT_BASE, MASCOT_BASE, MASCOT_BASE, MASCOT_BOB, MASCOT_BOB, MASCOT_BOB, MASCOT_BOB],
   blink: [MASCOT_BASE, MASCOT_BLINK, MASCOT_BLINK, MASCOT_BASE],
   wave: [MASCOT_BASE, MASCOT_WAVE_1, MASCOT_WAVE_2, MASCOT_WAVE_1],
   celebrate: [MASCOT_CELEBRATE_1, MASCOT_CELEBRATE_SPARKLES, MASCOT_CELEBRATE_1, MASCOT_CELEBRATE_SPARKLES],
+  error: [MASCOT_ERROR, MASCOT_ERROR_SHAKE, MASCOT_ERROR, MASCOT_ERROR_SHAKE],
 };

@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { componentDocs, type ComponentDoc } from '@/lib/component-docs';
-import { PixelButton, PixelCard, PixelBadge, PixelWindow, PixelLoader } from '@/components/ui';
+import { PixelButton, PixelCard, PixelBadge, PixelWindow, PixelLoader, PixelInput } from '@/components/ui';
 import { Mascot, PixelCreature, MASCOT_PALETTE, MASCOT_BASE, MASCOT_FRAMES } from '@/components/mascot';
 import { cn } from '@/lib/cn';
 import { CodeModal } from '@/components/ui/code-modal';
@@ -258,10 +258,18 @@ export default function LandingPage() {
       case 'Mascot':
         return (
           <div className="flex flex-col items-center justify-center h-full gap-4 group">
-            <span className="font-pixel text-[10px] text-[var(--text-3)] group-hover:text-[var(--accent)] transition-colors">Hover me</span>
+            <span className="font-pixel text-[10px] text-[var(--text-3)] group-hover:text-[var(--accent)] transition-colors">
+              Hover / tap me
+            </span>
             <div className="scale-125">
               <Mascot />
             </div>
+          </div>
+        );
+      case 'PixelInput':
+        return (
+          <div className="w-full max-w-[200px]">
+            <PixelInput label="PLAYER" placeholder="enter name..." />
           </div>
         );
       default:
@@ -334,19 +342,27 @@ export default function LandingPage() {
         </header>
 
         {/* Hero Section */}
-        <section className="p-[44px_32px_28px] border-b border-[var(--border)] shrink-0 bg-[var(--bg)]">
+        <section className="px-4 py-8 sm:px-8 sm:py-10 md:p-[44px_32px_28px] border-b border-[var(--border)] shrink-0 bg-[var(--bg)]">
           <div className="max-w-4xl">
-            <div className="font-pixel text-[10px] uppercase tracking-widest text-[var(--text-3)] mb-6">
+            <div className="font-pixel text-[10px] uppercase tracking-widest text-[var(--text-3)] mb-4 sm:mb-6">
               RETROCHUNK · V0.1 · {componentDocs?.length || 0} COMPONENTS
             </div>
-            <h2 className="font-pixel text-2xl md:text-3xl text-[var(--text)] leading-relaxed md:leading-relaxed mb-4 max-w-2xl">
-              A library of <span className="text-[var(--accent)]">pixel-art components</span> for your next retro project.
+            <h2 className="font-pixel text-xl sm:text-2xl md:text-3xl text-[var(--text)] leading-relaxed mb-3 sm:mb-4 max-w-2xl">
+              Pixel UI for React — <span className="text-[var(--accent)]">buttons to dashboards</span>, plus living mascots.
             </h2>
-            <p className="font-sans text-[15px] text-[var(--text-2)] mb-6 max-w-xl leading-relaxed">
-              Browse live. Copy the code. Drop it anywhere. Every component is self-contained and themeable.
+            <p className="font-sans text-[14px] sm:text-[15px] text-[var(--text-2)] mb-5 sm:mb-6 max-w-xl leading-relaxed">
+              Browse live. Copy the code. Theme with CSS variables. Built to ship retro product UIs — not just creature packs.
             </p>
-            <div className="font-mono text-[11px] text-[var(--text-3)] bg-[var(--surface-2)] inline-block px-3 py-1.5 border border-[var(--border)] shadow-[4px_4px_0_0_var(--accent-ink)]">
-              {componentDocs?.length || 0} components · {categories.length} categories · CSS vars
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="font-mono text-[11px] text-[var(--text-3)] bg-[var(--surface-2)] inline-block px-3 py-1.5 border border-[var(--border)] shadow-[4px_4px_0_0_var(--accent-ink)]">
+                {componentDocs?.length || 0} components · {categories.length} categories · CSS vars
+              </div>
+              <Link
+                href="/playground"
+                className="font-pixel text-[11px] text-[var(--accent-ink)] bg-[var(--accent)] border-2 border-[var(--accent-ink)] px-3 py-1.5 shadow-[3px_3px_0_0_var(--accent-ink)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+              >
+                Open Playground
+              </Link>
             </div>
           </div>
         </section>
@@ -372,7 +388,7 @@ export default function LandingPage() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-[14px]" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-[14px]">
               {filteredDocs.map((doc) => (
                 <div key={doc.name} className="group flex flex-col bg-[var(--surface)] border border-[var(--border)] hover:border-[rgba(255,176,32,0.4)] transition-colors overflow-hidden">
                   
