@@ -132,7 +132,7 @@ function ComponentPreview({ slug }: { slug: string }) {
         <div className="flex flex-wrap gap-6 items-end justify-center">
           {(["idle", "working", "think", "celebrate", "error"] as const).map((mood) => (
             <div key={mood} className="text-center">
-              <PixelPersonality name="bit" mood={mood} size={3} />
+              <PixelPersonality name="bit" mood={mood} size={4} />
               <p className="mt-2 text-xs uppercase" style={{ fontFamily: "var(--font-pixel)", color: "var(--text-3)" }}>
                 {mood}
               </p>

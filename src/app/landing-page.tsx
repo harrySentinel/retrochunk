@@ -369,8 +369,8 @@ export default function LandingPage() {
       case 'PixelPersonality':
         return (
           <div className="flex flex-col items-center justify-center gap-3 scale-110">
-            <PixelPersonality name="bit" mood="idle" size={4} />
-            <span className="font-pixel text-[10px] text-[var(--text-3)]">Bit · idle</span>
+            <PixelPersonality name="bit" mood="working" size={5} />
+            <span className="font-pixel text-[10px] text-[var(--text-3)]">Bit · working</span>
           </div>
         );
       default:

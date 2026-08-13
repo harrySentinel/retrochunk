@@ -1,355 +1,257 @@
-import { shift } from '../creature-helpers';
+import { patch, shift } from '../creature-helpers';
 import type { PersonalityPreset } from './types';
 
 /**
- * Bit — original RetroChunk CRT buddy.
- * Big glowing screen-face, amber bezel body, stubby legs.
- * Designed for product moods (not a ClaudePix clone).
+ * Bit — original RetroChunk personality.
+ * Clarity-first (big shapes, high contrast), like good pixel mascots:
+ * soft amber body, square eyes, cyan UI caret. Not a ClaudePix clone.
  */
 const PALETTE = [
   'transparent', // 0
-  '#16181E', // 1 ink / outline
-  '#FFB020', // 2 amber body
-  '#FFD56A', // 3 amber light
-  '#1EC8FF', // 4 screen glow
-  '#063447', // 5 screen deep
-  '#FF8B6A', // 6 blush
-  '#F4F7FB', // 7 white
-  '#C48410', // 8 amber shadow
+  '#111111', // 1 eye / ink
+  '#FFB020', // 2 body
+  '#35C2FF', // 3 caret / cool
+  '#FFE08A', // 4 body highlight
+  '#5A5E66', // 5 laptop screen
+  '#2A2C30', // 6 laptop / desk dark
+  '#D0D4D8', // 7 laptop logo / light gray
+  '#1A1C20', // 8 desk leg
   '#FF5470', // 9 danger
 ];
 
 const E = 0;
-const K = 1;
-const A = 2;
-const L = 3;
-const C = 4;
-const D = 5;
-const P = 6;
-const W = 7;
-const S = 8;
-const R = 9;
+const Y = 1; // eye / ink
+const B = 2; // body
+const C = 3; // cyan caret
+const H = 4; // highlight
+const SC = 5; // screen
+const DK = 6; // dark metal
+const LG = 7; // light gray
+const DL = 8; // desk leg
+const R = 9; // danger
 
-const empty = () => Array.from({ length: 20 }, () => Array(20).fill(E));
+const BASE: number[][] = [
+  // clear silhouette: caret + round head + body + feet
+  [E, E, E, E, E, E, E, E, E, E, E, E, E, E, E, E, E, E, E, E],
+  [E, E, E, E, E, E, E, E, E, C, E, E, E, E, E, E, E, E, E, E],
+  [E, E, E, E, E, E, E, E, E, C, E, E, E, E, E, E, E, E, E, E],
+  [E, E, E, E, E, E, E, E, E, C, E, E, E, E, E, E, E, E, E, E],
+  [E, E, E, E, E, E, B, B, B, B, B, B, B, B, E, E, E, E, E, E],
+  [E, E, E, E, E, B, B, B, B, B, B, B, B, B, B, E, E, E, E, E],
+  [E, E, E, E, B, B, Y, B, B, B, B, B, Y, B, B, B, E, E, E, E],
+  [E, E, E, E, B, B, B, B, B, B, B, B, B, B, B, B, E, E, E, E],
+  [E, E, E, E, B, B, B, B, Y, Y, Y, Y, B, B, B, B, E, E, E, E],
+  [E, E, E, E, E, B, B, B, B, B, B, B, B, B, B, E, E, E, E, E],
+  [E, E, E, E, E, E, B, B, B, B, B, B, B, B, E, E, E, E, E, E],
+  [E, E, E, E, B, B, B, B, B, B, B, B, B, B, B, B, E, E, E, E],
+  [E, E, E, B, B, B, B, B, B, B, B, B, B, B, B, B, B, E, E, E],
+  [E, E, E, B, B, B, B, B, B, B, B, B, B, B, B, B, B, E, E, E],
+  [E, E, E, B, E, B, B, B, B, B, B, B, B, B, B, E, B, E, E, E],
+  [E, E, E, E, E, B, B, B, B, B, B, B, B, B, B, E, E, E, E, E],
+  [E, E, E, E, E, B, B, B, B, B, B, B, B, B, B, E, E, E, E, E],
+  [E, E, E, E, E, E, E, B, E, E, E, E, B, E, E, E, E, E, E, E],
+  [E, E, E, E, E, E, E, B, E, E, E, E, B, E, E, E, E, E, E, E],
+  [E, E, E, E, E, E, E, E, E, E, E, E, E, E, E, E, E, E, E, E],
+];
 
-/** Paint helper: set many cells */
-function fill(grid: number[][], cells: Array<[number, number, number]>) {
-  for (const [r, c, v] of cells) {
-    if (r >= 0 && r < 20 && c >= 0 && c < 20) grid[r][c] = v;
-  }
-  return grid;
+const BLINK = patch(BASE, [
+  [6, 6, B],
+  [6, 12, B],
+]);
+
+const CARET_OFF = patch(BASE, [
+  [1, 9, E],
+  [2, 9, E],
+  [3, 9, E],
+]);
+
+const BOB = shift(BASE, 1, 0);
+
+// ── Working: creature at laptop + desk (readable props) ───────
+const WORK_BASE: number[][] = [
+  [E, E, E, E, E, E, E, E, E, E, E, E, E, E, E, E, E, E, E, E],
+  [E, E, E, E, E, E, E, E, E, C, E, E, E, E, E, E, E, E, E, E],
+  [E, E, E, E, E, E, E, E, E, C, E, E, E, E, E, E, E, E, E, E],
+  [E, E, E, E, E, B, B, B, B, B, B, B, B, B, E, E, E, E, E, E],
+  [E, E, E, E, B, B, B, B, B, B, B, B, B, B, B, E, E, E, E, E],
+  [E, E, E, E, B, B, Y, B, B, B, B, B, Y, B, B, E, E, E, E, E],
+  [E, E, E, E, B, B, B, B, B, B, B, B, B, B, B, E, E, E, E, E],
+  [E, E, E, E, B, B, B, B, Y, Y, Y, Y, B, B, B, E, E, E, E, E],
+  [E, E, E, B, B, B, B, B, B, B, B, B, B, B, B, B, E, E, E, E],
+  [E, E, E, B, B, B, SC, SC, SC, SC, SC, SC, SC, SC, B, B, E, E, E],
+  [E, E, E, B, B, B, SC, SC, SC, SC, SC, SC, SC, SC, B, B, E, E, E],
+  [E, E, E, B, B, B, SC, SC, SC, LG, LG, SC, SC, SC, B, B, E, E, E],
+  [E, E, E, E, B, DK, DK, DK, DK, DK, DK, DK, DK, DK, DK, B, E, E, E],
+  [E, DK, DK, DK, DK, DK, DK, DK, DK, DK, DK, DK, DK, DK, DK, DK, DK, DK, DK, E],
+  [E, E, DL, DL, E, E, E, E, E, E, E, E, E, E, E, E, DL, DL, E, E],
+  [E, E, DL, DL, E, E, E, E, E, E, E, E, E, E, E, E, DL, DL, E, E],
+  [E, E, DL, DL, E, E, E, E, E, E, E, E, E, E, E, E, DL, DL, E, E],
+  [E, E, DL, DL, E, E, E, E, E, E, E, E, E, E, E, E, DL, DL, E, E],
+  [E, E, E, E, E, E, E, E, E, E, E, E, E, E, E, E, E, E, E, E],
+  [E, E, E, E, E, E, E, E, E, E, E, E, E, E, E, E, E, E, E, E],
+];
+
+const TYPE_L = patch(WORK_BASE, [[12, 5, B]]);
+const TYPE_R = patch(WORK_BASE, [[12, 15, B]]);
+const TYPE_BOTH = patch(WORK_BASE, [
+  [12, 5, B],
+  [12, 15, B],
+]);
+const WORK_BLINK = patch(WORK_BASE, [
+  [5, 6, B],
+  [5, 12, B],
+]);
+const WORK_THINK = patch(WORK_BASE, [
+  [5, 6, B],
+  [5, 12, B],
+  [4, 6, Y],
+  [4, 12, Y],
+]);
+const CUR_ON = patch(WORK_THINK, [[10, 13, LG]]);
+
+// ── Celebrate: bounce + particles ─────────────────────────────
+const CROUCH = patch(shift(BASE, 1, 0), [
+  [14, 2, B],
+  [14, 17, B],
+]);
+const UP1 = shift(BASE, -1, 0);
+const UP2 = patch(shift(BASE, -2, 0), [
+  [12, 1, B],
+  [12, 2, B],
+  [13, 1, B],
+  [12, 17, B],
+  [12, 18, B],
+  [13, 18, B],
+]);
+const LAND = patch(BASE, [
+  [18, 4, C],
+  [18, 5, H],
+  [18, 14, H],
+  [18, 15, C],
+]);
+const IMPACT = patch(shift(BASE, 1, 0), [
+  [18, 3, C],
+  [18, 4, H],
+  [18, 15, H],
+  [18, 16, C],
+  [14, 2, B],
+  [14, 17, B],
+]);
+
+function spark(frame: number[][], pts: Array<[number, number]>) {
+  return pt(
+    frame,
+    pts.map(([r, c]) => [r, c, C] as [number, number, number])
+  );
+}
+function pt(f: number[][], ops: Array<[number, number, number]>) {
+  return patch(f, ops);
 }
 
-/**
- * Silhouette plan (20×20):
- * - rows 1–2   antenna
- * - rows 3–11  CRT head (bezel + glowing face)
- * - rows 12–15 compact body + arms
- * - rows 16–18 stubby legs
- */
-function drawBit(opts?: {
-  eyeY?: number;
-  blink?: boolean;
-  mouth?: 'smile' | 'flat' | 'frown' | 'open';
-  screen?: 'on' | 'dim' | 'error';
-  arm?: 'down' | 'out' | 'up' | 'typeL' | 'typeR';
-  antenna?: 'center' | 'left' | 'right' | 'off';
-  bob?: number;
-}): number[][] {
-  const eyeY = opts?.eyeY ?? 7;
-  const blink = opts?.blink ?? false;
-  const mouth = opts?.mouth ?? 'smile';
-  const screen = opts?.screen ?? 'on';
-  const arm = opts?.arm ?? 'down';
-  const antenna = opts?.antenna ?? 'center';
-  const bob = opts?.bob ?? 0;
+const TL: Array<[number, number]> = [
+  [0, 1],
+  [1, 1],
+  [0, 2],
+];
+const TR: Array<[number, number]> = [
+  [0, 18],
+  [1, 18],
+  [0, 17],
+];
+const ML: Array<[number, number]> = [
+  [6, 1],
+  [7, 0],
+];
+const MR: Array<[number, number]> = [
+  [6, 18],
+  [7, 19],
+];
 
-  const g = empty();
-  const o = (r: number, c: number, v: number) => {
-    const rr = r + bob;
-    if (rr >= 0 && rr < 20 && c >= 0 && c < 20) g[rr][c] = v;
-  };
+// ── Error ─────────────────────────────────────────────────────
+const ERROR = patch(BASE, [
+  [1, 9, R],
+  [2, 9, R],
+  [3, 9, R],
+  [6, 6, Y],
+  [6, 7, R],
+  [6, 11, R],
+  [6, 12, Y],
+  [5, 6, Y],
+  [5, 12, Y],
+  [7, 6, Y],
+  [7, 12, Y],
+  [8, 8, Y],
+  [8, 9, Y],
+  [8, 10, Y],
+  [8, 11, Y],
+]);
+const ERROR_SHAKE = shift(ERROR, 0, 1);
 
-  // Antenna
-  if (antenna !== 'off') {
-    const tipC = antenna === 'left' ? 8 : antenna === 'right' ? 11 : 9;
-    o(1, tipC, C);
-    o(1, tipC + 1, C);
-    o(2, tipC, K);
-    o(2, tipC + 1, W);
-    o(3, 9, K);
-    o(3, 10, K);
-  }
-
-  // CRT outer bezel (rounded square)
-  for (let c = 5; c <= 14; c++) {
-    o(4, c, K);
-    o(12, c, K);
-  }
-  for (let r = 5; r <= 11; r++) {
-    o(r, 4, K);
-    o(r, 15, K);
-  }
-  // amber plastic shell
-  for (let r = 5; r <= 11; r++) {
-    for (let c = 5; c <= 14; c++) {
-      const edge = r === 5 || r === 11 || c === 5 || c === 14;
-      o(r, c, edge ? S : A);
-    }
-  }
-  // light rim
-  for (let c = 6; c <= 13; c++) o(5, c, L);
-  o(6, 5, L);
-  o(6, 14, L);
-
-  // Screen glass
-  const glass = screen === 'error' ? R : screen === 'dim' ? D : D;
-  const glow = screen === 'error' ? R : screen === 'dim' ? K : C;
-  for (let r = 6; r <= 10; r++) {
-    for (let c = 6; c <= 13; c++) o(r, c, glass);
-  }
-  // inner glow frame
-  for (let c = 6; c <= 13; c++) {
-    o(6, c, glow);
-    o(10, c, glow);
-  }
-  for (let r = 7; r <= 9; r++) {
-    o(r, 6, glow);
-    o(r, 13, glow);
-  }
-
-  // Cheeks
-  if (screen === 'on') {
-    o(8, 7, P);
-    o(8, 12, P);
-  }
-
-  // Eyes
-  if (blink) {
-    o(eyeY, 8, glow);
-    o(eyeY, 9, glow);
-    o(eyeY, 10, glow);
-    o(eyeY, 11, glow);
-  } else if (screen === 'error') {
-    // X eyes
-    o(eyeY, 8, W);
-    o(eyeY, 9, R);
-    o(eyeY, 10, R);
-    o(eyeY, 11, W);
-    o(eyeY - 1, 8, W);
-    o(eyeY + 1, 8, W);
-    o(eyeY - 1, 11, W);
-    o(eyeY + 1, 11, W);
-  } else {
-    o(eyeY, 8, W);
-    o(eyeY, 9, K);
-    o(eyeY, 10, W);
-    o(eyeY, 11, K);
-    // shiny dots
-    o(eyeY - 1, 8, W);
-    o(eyeY - 1, 10, W);
-  }
-
-  // Mouth
-  if (mouth === 'smile') {
-    o(9, 9, W);
-    o(9, 10, W);
-    o(10, 8, W);
-    o(10, 11, W);
-  } else if (mouth === 'open') {
-    o(9, 9, W);
-    o(9, 10, W);
-    o(10, 9, K);
-    o(10, 10, K);
-  } else if (mouth === 'frown') {
-    o(10, 9, W);
-    o(10, 10, W);
-    o(9, 8, W);
-    o(9, 11, W);
-  } else {
-    o(9, 8, W);
-    o(9, 9, W);
-    o(9, 10, W);
-    o(9, 11, W);
-  }
-
-  // Neck / body
-  o(13, 8, K);
-  o(13, 9, A);
-  o(13, 10, A);
-  o(13, 11, K);
-  for (let r = 14; r <= 15; r++) {
-    for (let c = 7; c <= 12; c++) o(r, c, c === 7 || c === 12 ? K : A);
-  }
-  o(14, 8, L);
-  o(14, 9, L);
-
-  // Arms
-  if (arm === 'down') {
-    o(14, 5, K);
-    o(14, 6, A);
-    o(15, 5, A);
-    o(15, 6, S);
-    o(14, 13, A);
-    o(14, 14, K);
-    o(15, 13, S);
-    o(15, 14, A);
-  } else if (arm === 'out') {
-    o(14, 3, K);
-    o(14, 4, A);
-    o(14, 5, A);
-    o(15, 3, A);
-    o(14, 14, A);
-    o(14, 15, A);
-    o(14, 16, K);
-    o(15, 16, A);
-  } else if (arm === 'up') {
-    o(12, 3, A);
-    o(12, 4, A);
-    o(13, 3, K);
-    o(13, 4, A);
-    o(12, 15, A);
-    o(12, 16, A);
-    o(13, 15, A);
-    o(13, 16, K);
-  } else if (arm === 'typeL') {
-    o(15, 4, K);
-    o(15, 5, A);
-    o(16, 5, A);
-    o(16, 6, L);
-    o(14, 13, A);
-    o(14, 14, K);
-    o(15, 13, S);
-    o(15, 14, A);
-  } else if (arm === 'typeR') {
-    o(14, 5, K);
-    o(14, 6, A);
-    o(15, 5, A);
-    o(15, 6, S);
-    o(15, 14, A);
-    o(15, 15, K);
-    o(16, 13, L);
-    o(16, 14, A);
-  }
-
-  // Mini keyboard shelf (for working)
-  if (arm === 'typeL' || arm === 'typeR') {
-    for (let c = 6; c <= 13; c++) o(17, c, K);
-    for (let c = 7; c <= 12; c++) o(17, c, c % 2 === 0 ? L : A);
-  }
-
-  // Legs
-  o(16, 8, K);
-  o(16, 9, A);
-  o(16, 10, A);
-  o(16, 11, K);
-  if (arm !== 'typeL' && arm !== 'typeR') {
-    o(17, 8, S);
-    o(17, 9, A);
-    o(17, 10, A);
-    o(17, 11, S);
-    o(18, 8, K);
-    o(18, 9, K);
-    o(18, 10, K);
-    o(18, 11, K);
-  } else {
-    o(18, 8, K);
-    o(18, 9, K);
-    o(18, 10, K);
-    o(18, 11, K);
-  }
-
-  return g;
-}
-
-const BASE = drawBit();
-const BLINK = drawBit({ blink: true });
-const BOB = drawBit({ bob: 1 });
-const IDLE_GLOW = drawBit({ antenna: 'center' });
-const IDLE_GLOW2 = fill(drawBit({ antenna: 'center' }), [
-  [1, 9, W],
+const THINK_STAND = patch(BASE, [
+  [6, 6, B],
+  [6, 12, B],
+  [5, 6, Y],
+  [5, 12, Y],
+]);
+const THINK_CARET = patch(THINK_STAND, [
+  [1, 9, E],
+  [0, 9, C],
+  [0, 10, C],
   [1, 10, C],
 ]);
-
-const WORK_L = drawBit({ arm: 'typeL', antenna: 'left', mouth: 'flat' });
-const WORK_R = drawBit({ arm: 'typeR', antenna: 'right', mouth: 'flat' });
-const WORK_BOTH = drawBit({ arm: 'typeL', antenna: 'center', mouth: 'open' });
-const WORK_BLINK = drawBit({ arm: 'typeR', blink: true, mouth: 'flat' });
-
-const THINK = drawBit({ eyeY: 6, mouth: 'flat', antenna: 'right' });
-const THINK_DOT = fill(drawBit({ eyeY: 6, mouth: 'flat', antenna: 'right' }), [
-  [2, 15, W],
-  [3, 16, C],
-  [4, 16, W],
-]);
-
-const JUMP = drawBit({ bob: -2, arm: 'up', mouth: 'open', antenna: 'center' });
-const JUMP2 = fill(drawBit({ bob: -3, arm: 'up', mouth: 'open' }), [
-  [5, 2, W],
-  [6, 17, C],
-  [16, 3, L],
-  [16, 16, C],
-  [17, 4, W],
-  [17, 15, W],
-]);
-const LAND = fill(drawBit({ bob: 1, arm: 'out', mouth: 'smile' }), [
-  [19, 6, C],
-  [19, 7, W],
-  [19, 12, W],
-  [19, 13, C],
-]);
-
-const ERROR = drawBit({ screen: 'error', mouth: 'frown', antenna: 'off', arm: 'down' });
-const ERROR_SHAKE = shift(ERROR, 0, 1);
-const ERROR_DIM = drawBit({ screen: 'dim', mouth: 'frown', antenna: 'off', blink: true });
 
 export const bitPersonality: PersonalityPreset = {
   id: 'bit',
   name: 'Bit',
   description:
-    'RetroChunk’s original CRT buddy — glowing screen-face, amber shell, stubby legs. Moods map to real UI states.',
+    'RetroChunk’s amber UI buddy — big readable shapes, square eyes, cyan caret. Moods for idle, work, think, celebrate, error.',
   gridSize: 20,
   palette: PALETTE,
   base: BASE,
   moods: {
     idle: [
-      { hold: 520, grid: BASE },
-      { hold: 480, grid: IDLE_GLOW },
-      { hold: 420, grid: BOB },
-      { hold: 100, grid: BLINK },
-      { hold: 380, grid: IDLE_GLOW2 },
       { hold: 500, grid: BASE },
+      { hold: 450, grid: BOB },
+      { hold: 90, grid: BLINK },
+      { hold: 400, grid: BASE },
+      { hold: 220, grid: CARET_OFF },
+      { hold: 400, grid: BASE },
     ],
     working: [
-      { hold: 140, grid: WORK_L },
-      { hold: 140, grid: WORK_R },
-      { hold: 140, grid: WORK_L },
-      { hold: 140, grid: WORK_R },
-      { hold: 120, grid: WORK_BOTH },
+      { hold: 160, grid: TYPE_L },
+      { hold: 160, grid: TYPE_R },
+      { hold: 160, grid: TYPE_L },
+      { hold: 160, grid: TYPE_R },
+      { hold: 140, grid: TYPE_BOTH },
       { hold: 90, grid: WORK_BLINK },
-      { hold: 140, grid: WORK_L },
-      { hold: 140, grid: WORK_R },
+      { hold: 160, grid: TYPE_L },
+      { hold: 160, grid: TYPE_R },
+      { hold: 350, grid: WORK_THINK },
+      { hold: 280, grid: CUR_ON },
+      { hold: 260, grid: WORK_THINK },
+      { hold: 280, grid: CUR_ON },
     ],
     think: [
-      { hold: 520, grid: THINK },
-      { hold: 340, grid: THINK_DOT },
-      { hold: 480, grid: THINK },
-      { hold: 280, grid: THINK_DOT },
+      { hold: 420, grid: THINK_STAND },
+      { hold: 320, grid: THINK_CARET },
+      { hold: 400, grid: THINK_STAND },
+      { hold: 280, grid: THINK_CARET },
     ],
     celebrate: [
+      { hold: 90, grid: spark(CROUCH, [...TL, ...TR]) },
+      { hold: 80, grid: spark(UP1, ML) },
+      { hold: 140, grid: spark(UP2, [...TL, ...TR, ...MR]) },
+      { hold: 80, grid: spark(UP1, TR) },
+      { hold: 70, grid: spark(LAND, TL) },
+      { hold: 90, grid: spark(IMPACT, [...TL, ...TR]) },
+      { hold: 120, grid: spark(BASE, [...TL, ...TR, ...ML, ...MR]) },
       { hold: 100, grid: BASE },
-      { hold: 120, grid: JUMP },
-      { hold: 160, grid: JUMP2 },
-      { hold: 120, grid: JUMP },
-      { hold: 140, grid: LAND },
-      { hold: 180, grid: BASE },
     ],
     error: [
-      { hold: 260, grid: ERROR },
+      { hold: 280, grid: ERROR },
       { hold: 160, grid: ERROR_SHAKE },
-      { hold: 240, grid: ERROR_DIM },
+      { hold: 240, grid: ERROR },
       { hold: 160, grid: ERROR_SHAKE },
-      { hold: 260, grid: ERROR },
     ],
   },
 };
