@@ -3,7 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { PixelButton, PixelCard, PixelBadge, PixelInput, PixelWindow } from '@/components/ui';
-import { Mascot, type MascotAnimation } from '@/components/mascot';
+import { Mascot, type MascotAnimation, PixelPersonality } from '@/components/mascot';
 import { useToast } from '@/components/ui/toast';
 import { cn } from '@/lib/cn';
 
@@ -85,6 +85,7 @@ export default function PlaygroundPage() {
                     </p>
                   </div>
                   <Mascot animation={mascotMood} size={5} />
+                  <PixelPersonality name="bit" mood={mascotMood === 'celebrate' ? 'celebrate' : mascotMood === 'error' ? 'error' : 'working'} size={4} />
                 </div>
                 <PixelInput
                   label="EMAIL"

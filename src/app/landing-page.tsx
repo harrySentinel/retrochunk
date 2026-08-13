@@ -3,14 +3,22 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { componentDocs, type ComponentDoc } from '@/lib/component-docs';
+import { librarySections } from '@/lib/library-sections';
 import { PixelButton, PixelCard, PixelBadge, PixelWindow, PixelLoader, PixelInput } from '@/components/ui';
-import { Mascot, PixelCreature, MASCOT_PALETTE, MASCOT_BASE, MASCOT_FRAMES } from '@/components/mascot';
+import {
+  Mascot,
+  PixelCreature,
+  PixelPersonality,
+  MASCOT_PALETTE,
+  MASCOT_BASE,
+} from '@/components/mascot';
 import { cn } from '@/lib/cn';
 import { CodeModal } from '@/components/ui/code-modal';
 import { useToast } from '@/components/ui/toast';
 
 export default function LandingPage() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [activeSlug, setActiveSlug] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -38,39 +46,54 @@ export default function LandingPage() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const filteredDocs = useMemo(() => {
-    return componentDocs?.filter((doc) => {
-      const matchesCategory = activeCategory ? doc.category === activeCategory : true;
-      const matchesSearch =
-        doc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        doc.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        doc.category.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchesCategory && matchesSearch;
-    }) || [];
-  }, [activeCategory, searchQuery]);
-
-  const categories = [
-    { id: 'primitive', label: 'PRIMITIVES' },
-    { id: 'mascot', label: 'MASCOT' },
-    { id: 'block', label: 'BLOCKS' },
-  ];
-
-  // Helper to count category items
-  const getCategoryCount = (categoryId: string) => {
-    return componentDocs?.filter(d => d.category === categoryId).length || 0;
+  const clearFilters = () => {
+    setActiveCategory(null);
+    setActiveSlug(null);
+    setSearchQuery('');
   };
+
+  const selectSection = (categoryId: string) => {
+    setActiveCategory(categoryId);
+    setActiveSlug(null);
+    setIsSidebarOpen(false);
+  };
+
+  const selectItem = (doc: ComponentDoc) => {
+    setActiveCategory(doc.category);
+    setActiveSlug(doc.slug);
+    setIsSidebarOpen(false);
+  };
+
+  const filteredDocs = useMemo(() => {
+    return (
+      componentDocs?.filter((doc) => {
+        const matchesCategory = activeCategory ? doc.category === activeCategory : true;
+        const matchesSlug = activeSlug ? doc.slug === activeSlug : true;
+        const q = searchQuery.toLowerCase();
+        const matchesSearch =
+          !q ||
+          doc.name.toLowerCase().includes(q) ||
+          doc.description.toLowerCase().includes(q) ||
+          doc.category.toLowerCase().includes(q) ||
+          doc.slug.toLowerCase().includes(q);
+        return matchesCategory && matchesSlug && matchesSearch;
+      }) || []
+    );
+  }, [activeCategory, activeSlug, searchQuery]);
+
+  const getCategoryCount = (categoryId: string) =>
+    componentDocs?.filter((d) => d.category === categoryId).length || 0;
 
   const SidebarContent = ({ isCollapsed }: { isCollapsed: boolean }) => (
     <div className="flex flex-col h-full">
-      {/* Brand */}
-      <div className={cn("flex items-center gap-3 mb-8", isCollapsed ? "justify-center" : "")}>
+      <div className={cn('flex items-center gap-3 mb-8', isCollapsed ? 'justify-center' : '')}>
         <div className="grid grid-cols-4 grid-rows-4 w-6 h-6 gap-[1px]">
           {[...Array(16)].map((_, i) => (
             <div
               key={i}
               className={cn(
-                "w-full h-full",
-                [0, 3, 5, 6, 9, 10, 12, 15].includes(i) ? "bg-[var(--accent)]" : "bg-transparent"
+                'w-full h-full',
+                [0, 3, 5, 6, 9, 10, 12, 15].includes(i) ? 'bg-[var(--accent)]' : 'bg-transparent'
               )}
             />
           ))}
@@ -83,33 +106,56 @@ export default function LandingPage() {
         )}
       </div>
 
-      {/* Navigation */}
-      <nav className={cn("flex-1 overflow-y-auto pb-4 scrollbar-thin", isCollapsed ? "space-y-4 px-0" : "space-y-6 pr-2")}>
+      <nav
+        className={cn(
+          'flex-1 overflow-y-auto pb-4 scrollbar-thin',
+          isCollapsed ? 'space-y-4 px-0' : 'space-y-6 pr-2'
+        )}
+      >
         <div>
           <button
             title="All Components"
-            onClick={() => { setActiveCategory(null); setIsSidebarOpen(false); }}
+            onClick={() => {
+              clearFilters();
+              setIsSidebarOpen(false);
+            }}
             className={cn(
-              "w-full flex items-center transition-colors group",
-              isCollapsed ? "justify-center py-2" : "justify-between px-2.5 py-1.5",
-              activeCategory === null
-                ? "bg-[rgba(255,176,32,0.12)] text-[var(--accent)]"
-                : "text-[var(--text-2)] hover:bg-[var(--surface-2)]"
+              'w-full flex items-center transition-colors group',
+              isCollapsed ? 'justify-center py-2' : 'justify-between px-2.5 py-1.5',
+              activeCategory === null && activeSlug === null
+                ? 'bg-[rgba(255,176,32,0.12)] text-[var(--accent)]'
+                : 'text-[var(--text-2)] hover:bg-[var(--surface-2)]'
             )}
           >
             {isCollapsed ? (
-              <span className={cn("font-pixel text-[16px]", activeCategory === null ? "text-[var(--accent)]" : "text-[var(--text-2)] group-hover:text-[var(--text)]")}>⊞</span>
+              <span
+                className={cn(
+                  'font-pixel text-[16px]',
+                  activeCategory === null ? 'text-[var(--accent)]' : 'text-[var(--text-2)] group-hover:text-[var(--text)]'
+                )}
+              >
+                ⊞
+              </span>
             ) : (
               <>
-                <span className={cn("font-pixel text-[12px]", activeCategory === null ? "text-[var(--accent)]" : "text-[var(--text-2)] group-hover:text-[var(--text)]")}>
+                <span
+                  className={cn(
+                    'font-pixel text-[12px]',
+                    activeCategory === null && activeSlug === null
+                      ? 'text-[var(--accent)]'
+                      : 'text-[var(--text-2)] group-hover:text-[var(--text)]'
+                  )}
+                >
                   All Components
                 </span>
-                <span className={cn(
-                  "text-[10px] px-[7px] py-[1px] min-w-[22px] text-center font-mono",
-                  activeCategory === null
-                    ? "bg-[rgba(255,176,32,0.2)] text-[var(--accent)]"
-                    : "bg-[var(--surface-2)] text-[var(--text-3)] group-hover:text-[var(--text-2)]"
-                )}>
+                <span
+                  className={cn(
+                    'text-[10px] px-[7px] py-[1px] min-w-[22px] text-center font-mono',
+                    activeCategory === null && activeSlug === null
+                      ? 'bg-[rgba(255,176,32,0.2)] text-[var(--accent)]'
+                      : 'bg-[var(--surface-2)] text-[var(--text-3)] group-hover:text-[var(--text-2)]'
+                  )}
+                >
                   {componentDocs?.length || 0}
                 </span>
               </>
@@ -117,89 +163,137 @@ export default function LandingPage() {
           </button>
         </div>
 
-        {categories.map((cat) => {
-          const count = getCategoryCount(cat.id);
-          if (count === 0) return null;
-          
+        {librarySections.map((section) => {
+          const items = componentDocs?.filter((d) => d.category === section.id) || [];
+          if (items.length === 0) return null;
+          const sectionActive = activeCategory === section.id && !activeSlug;
+
           if (isCollapsed) {
             return (
-              <div key={cat.id} className="flex justify-center">
+              <div key={section.id} className="flex justify-center">
                 <button
-                  title={cat.label}
-                  onClick={() => { setActiveCategory(cat.id); setIsSidebarOpen(false); }}
+                  title={section.label}
+                  onClick={() => selectSection(section.id)}
                   className={cn(
-                    "w-10 h-10 flex items-center justify-center transition-colors border border-[var(--border)]",
-                    activeCategory === cat.id
-                      ? "bg-[rgba(255,176,32,0.12)] border-[rgba(255,176,32,0.4)] text-[var(--accent)]"
-                      : "text-[var(--text-3)] hover:text-[var(--text)] hover:bg-[var(--surface-2)]"
+                    'w-10 h-10 flex items-center justify-center transition-colors border border-[var(--border)]',
+                    activeCategory === section.id
+                      ? 'bg-[rgba(255,176,32,0.12)] border-[rgba(255,176,32,0.4)] text-[var(--accent)]'
+                      : 'text-[var(--text-3)] hover:text-[var(--text)] hover:bg-[var(--surface-2)]'
                   )}
                 >
-                  <span className="font-pixel text-[14px]">{cat.label.charAt(0)}</span>
+                  <span className="font-pixel text-[14px]">{section.icon}</span>
                 </button>
               </div>
             );
           }
 
           return (
-            <div key={cat.id}>
-              <div className="flex items-center gap-3 mb-2 px-1">
-                <h2 className="text-[10px] tracking-[0.22em] uppercase text-[var(--text-3)] font-sans font-semibold">
-                  {cat.label}
+            <div key={section.id}>
+              <button
+                type="button"
+                onClick={() => selectSection(section.id)}
+                className="w-full flex items-center gap-3 mb-2 px-1 group text-left"
+                title={section.description}
+              >
+                <h2
+                  className={cn(
+                    'text-[10px] tracking-[0.22em] uppercase font-sans font-semibold',
+                    sectionActive ? 'text-[var(--accent)]' : 'text-[var(--text-3)] group-hover:text-[var(--text-2)]'
+                  )}
+                >
+                  {section.label}
                 </h2>
-                <div className="flex-1 h-[1px]" style={{ background: 'repeating-linear-gradient(to right, var(--border) 0 3px, transparent 3px 6px)' }} />
-              </div>
+                <div
+                  className="flex-1 h-[1px]"
+                  style={{
+                    background:
+                      'repeating-linear-gradient(to right, var(--border) 0 3px, transparent 3px 6px)',
+                  }}
+                />
+                <span className="font-mono text-[9px] text-[var(--text-3)]">{getCategoryCount(section.id)}</span>
+              </button>
               <ul className="space-y-0.5">
-                {componentDocs?.filter(d => d.category === cat.id).map(doc => (
-                  <li key={doc.name}>
-                    <button
-                      onClick={() => { setActiveCategory(cat.id); setIsSidebarOpen(false); }}
-                      className={cn(
-                        "w-full flex items-center justify-between px-2.5 py-1.5 transition-colors group",
-                        activeCategory === cat.id
-                          ? "bg-[rgba(255,176,32,0.12)] text-[var(--accent)]"
-                          : "text-[var(--text-2)] hover:bg-[var(--surface-2)]"
-                      )}
-                    >
-                      <span className="flex items-center gap-2">
-                        <span className={cn("text-[9px]", activeCategory === cat.id ? "text-[var(--accent)]" : "text-[var(--text-3)]")}>▸</span>
-                        <span className={cn("font-pixel text-[12px]", activeCategory === cat.id ? "text-[var(--accent)]" : "text-[var(--text-2)] group-hover:text-[var(--text)]")}>
-                          {doc.name}
+                {items.map((doc) => {
+                  const itemActive = activeSlug === doc.slug;
+                  return (
+                    <li key={doc.slug}>
+                      <button
+                        type="button"
+                        onClick={() => selectItem(doc)}
+                        className={cn(
+                          'w-full flex items-center justify-between px-2.5 py-1.5 transition-colors group',
+                          itemActive
+                            ? 'bg-[rgba(255,176,32,0.12)] text-[var(--accent)]'
+                            : 'text-[var(--text-2)] hover:bg-[var(--surface-2)]'
+                        )}
+                      >
+                        <span className="flex items-center gap-2 min-w-0">
+                          <span
+                            className={cn(
+                              'text-[9px]',
+                              itemActive ? 'text-[var(--accent)]' : 'text-[var(--text-3)]'
+                            )}
+                          >
+                            ▸
+                          </span>
+                          <span
+                            className={cn(
+                              'font-pixel text-[12px] truncate',
+                              itemActive
+                                ? 'text-[var(--accent)]'
+                                : 'text-[var(--text-2)] group-hover:text-[var(--text)]'
+                            )}
+                          >
+                            {doc.name}
+                          </span>
                         </span>
-                      </span>
-                    </button>
-                  </li>
-                ))}
+                      </button>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           );
         })}
+
+        <div className={cn(isCollapsed ? 'hidden' : 'px-1 pt-2')}>
+          <Link
+            href="/playground"
+            onClick={() => setIsSidebarOpen(false)}
+            className="w-full flex items-center gap-2 px-2.5 py-2 font-pixel text-[11px] text-[var(--accent)] border border-[rgba(255,176,32,0.35)] bg-[rgba(255,176,32,0.08)] hover:bg-[rgba(255,176,32,0.14)] transition-colors"
+          >
+            <span>▸</span> Playground
+          </Link>
+        </div>
       </nav>
 
-      {/* Shortcuts */}
       {!isCollapsed && (
         <div className="mt-auto pt-4 border-t border-[var(--border)]">
           <div className="flex items-center justify-between text-[11px] text-[var(--text-3)] font-sans mb-2">
             <span>Search</span>
-            <kbd className="bg-[var(--surface-2)] border border-[var(--border)] px-1.5 py-0.5 text-[10px] font-mono leading-none">/</kbd>
+            <kbd className="bg-[var(--surface-2)] border border-[var(--border)] px-1.5 py-0.5 text-[10px] font-mono leading-none">
+              /
+            </kbd>
           </div>
           <div className="flex items-center justify-between text-[11px] text-[var(--text-3)] font-sans">
             <span>Clear / Close</span>
-            <kbd className="bg-[var(--surface-2)] border border-[var(--border)] px-1.5 py-0.5 text-[10px] font-mono leading-none">esc</kbd>
+            <kbd className="bg-[var(--surface-2)] border border-[var(--border)] px-1.5 py-0.5 text-[10px] font-mono leading-none">
+              esc
+            </kbd>
           </div>
         </div>
       )}
 
-      {/* Collapse Toggle */}
-      <button 
-        title={isCollapsed ? "Expand" : "Collapse"}
+      <button
+        title={isCollapsed ? 'Expand' : 'Collapse'}
         onClick={() => {
           const newState = !isCollapsed;
           setIsCollapsed(newState);
           localStorage.setItem('retrochunk-sidebar-collapsed', String(newState));
         }}
         className={cn(
-          "w-full py-2 text-center text-[var(--text-3)] hover:text-[var(--text)] hover:bg-[var(--surface-2)] transition-colors border-t border-[var(--border)] mt-4",
-          isCollapsed ? "text-[16px]" : "text-[12px]"
+          'w-full py-2 text-center text-[var(--text-3)] hover:text-[var(--text)] hover:bg-[var(--surface-2)] transition-colors border-t border-[var(--border)] mt-4',
+          isCollapsed ? 'text-[16px]' : 'text-[12px]'
         )}
       >
         <span className="font-pixel">{isCollapsed ? '»' : '«'}</span>
@@ -270,6 +364,13 @@ export default function LandingPage() {
         return (
           <div className="w-full max-w-[200px]">
             <PixelInput label="PLAYER" placeholder="enter name..." />
+          </div>
+        );
+      case 'PixelPersonality':
+        return (
+          <div className="flex flex-col items-center justify-center gap-3">
+            <PixelPersonality name="bit" mood="working" size={5} />
+            <span className="font-pixel text-[10px] text-[var(--text-3)]">Bit · working</span>
           </div>
         );
       default:
@@ -351,11 +452,12 @@ export default function LandingPage() {
               Pixel UI for React — <span className="text-[var(--accent)]">buttons to dashboards</span>, plus living mascots.
             </h2>
             <p className="font-sans text-[14px] sm:text-[15px] text-[var(--text-2)] mb-5 sm:mb-6 max-w-xl leading-relaxed">
-              Browse live. Copy the code. Theme with CSS variables. Built to ship retro product UIs — not just creature packs.
+              Browse live. Copy the code. Theme with CSS variables. Built to ship retro product UIs and
+              living mascot personalities — not just creature packs.
             </p>
             <div className="flex flex-wrap items-center gap-3">
               <div className="font-mono text-[11px] text-[var(--text-3)] bg-[var(--surface-2)] inline-block px-3 py-1.5 border border-[var(--border)] shadow-[4px_4px_0_0_var(--accent-ink)]">
-                {componentDocs?.length || 0} components · {categories.length} categories · CSS vars
+                {componentDocs?.length || 0} components · {librarySections.length} sections · CSS vars
               </div>
               <Link
                 href="/playground"
@@ -381,7 +483,7 @@ export default function LandingPage() {
               <div className="font-pixel text-4xl mb-4 text-[var(--text-3)]">?</div>
               <p className="font-pixel text-sm text-[var(--text-2)]">No components found.</p>
               <button 
-                onClick={() => { setSearchQuery(''); setActiveCategory(null); }}
+                onClick={clearFilters}
                 className="mt-4 font-pixel text-xs text-[var(--accent)] hover:underline"
               >
                 Clear filters

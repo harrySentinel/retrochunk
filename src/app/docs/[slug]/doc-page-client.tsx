@@ -3,8 +3,8 @@
 import Link from "next/link";
 import type { ComponentDoc } from "@/lib/component-docs";
 import { CodeBlock } from "@/components/ui/code-block";
-import { PixelButton, PixelBadge, PixelCard, PixelWindow, PixelLoader } from "@/components/ui";
-import { Mascot, PixelCreature, MASCOT_PALETTE, MASCOT_BASE, MASCOT_FRAMES } from "@/components/mascot";
+import { PixelButton, PixelBadge, PixelCard, PixelWindow, PixelLoader, PixelInput } from "@/components/ui";
+import { Mascot, PixelCreature, PixelPersonality, MASCOT_PALETTE, MASCOT_BASE, MASCOT_FRAMES } from "@/components/mascot";
 
 function ComponentPreview({ slug }: { slug: string }) {
   switch (slug) {
@@ -117,6 +117,27 @@ function ComponentPreview({ slug }: { slug: string }) {
             <Mascot animation="celebrate" size={10} />
             <p className="mt-2 text-xs" style={{ fontFamily: "var(--font-pixel)", color: "var(--text-3)" }}>Celebrate</p>
           </div>
+        </div>
+      );
+    case "pixel-input":
+      return (
+        <div className="flex flex-col gap-4 max-w-sm w-full">
+          <PixelInput label="PLAYER" placeholder="enter name..." />
+          <PixelInput label="EMAIL" hint="We never share this." defaultValue="you@arcade.dev" />
+          <PixelInput label="CODE" error="Invalid invite code." defaultValue="XXXX" />
+        </div>
+      );
+    case "pixel-personality":
+      return (
+        <div className="flex flex-wrap gap-8 items-end justify-center">
+          {(["idle", "working", "think", "celebrate", "error"] as const).map((mood) => (
+            <div key={mood} className="text-center">
+              <PixelPersonality name="bit" mood={mood} size={5} />
+              <p className="mt-2 text-xs uppercase" style={{ fontFamily: "var(--font-pixel)", color: "var(--text-3)" }}>
+                {mood}
+              </p>
+            </div>
+          ))}
         </div>
       );
     default:
