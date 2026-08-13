@@ -3,6 +3,12 @@ export interface ComponentDoc {
   name: string;
   description: string;
   category: "primitive" | "mascot" | "block";
+  /** Optional nest under a personality pack in the sidebar (e.g. "volt") */
+  group?: string;
+  groupLabel?: string;
+  /** Personality mood for live previews */
+  mood?: string;
+  personality?: string;
   props: PropDef[];
   code: string;
 }
@@ -13,6 +19,8 @@ export interface PropDef {
   default?: string;
   description: string;
 }
+
+import { voltPresetDocs } from "./volt-presets";
 
 export const componentDocs: ComponentDoc[] = [
   {
@@ -219,31 +227,7 @@ const palette = [
 <PixelPersonality name="bit" mood="celebrate" size={8} />
 <PixelPersonality name="bit" mood="error" size={8} />`,
   },
-  {
-    slug: "volt",
-    name: "Volt",
-    description:
-      "Soft-haired RetroChunk character — teal tunic, amber belt, cyan streak. Behaviours: idle, wave, train, think, dash, flex, celebrate, error.",
-    category: "mascot",
-    props: [
-      { name: "name", type: "'volt'", default: "'volt'", description: "Personality id." },
-      {
-        name: "mood",
-        type: "'idle' | 'wave' | 'working' | 'think' | 'dash' | 'flex' | 'celebrate' | 'error'",
-        default: "'idle'",
-        description: "Behaviour / emotion.",
-      },
-      { name: "size", type: "number", default: "8", description: "Pixel size of each cell." },
-      { name: "className", type: "string", description: "Additional CSS classes." },
-    ],
-    code: `import { PixelPersonality } from "@/components/mascot";
-
-<PixelPersonality name="volt" mood="idle" size={8} />
-<PixelPersonality name="volt" mood="wave" size={8} />
-<PixelPersonality name="volt" mood="dash" size={8} />
-<PixelPersonality name="volt" mood="flex" size={8} />
-<PixelPersonality name="volt" mood="celebrate" size={8} />`,
-  },
+  ...voltPresetDocs,
   {
     slug: "hero-pixel",
     name: "HeroPixel",

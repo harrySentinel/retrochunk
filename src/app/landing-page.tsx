@@ -19,6 +19,7 @@ import { useToast } from '@/components/ui/toast';
 export default function LandingPage() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [activeSlug, setActiveSlug] = useState<string | null>(null);
+  const [activeGroup, setActiveGroup] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -49,11 +50,20 @@ export default function LandingPage() {
   const clearFilters = () => {
     setActiveCategory(null);
     setActiveSlug(null);
+    setActiveGroup(null);
     setSearchQuery('');
   };
 
   const selectSection = (categoryId: string) => {
     setActiveCategory(categoryId);
+    setActiveSlug(null);
+    setActiveGroup(null);
+    setIsSidebarOpen(false);
+  };
+
+  const selectGroup = (groupId: string, categoryId: string) => {
+    setActiveCategory(categoryId);
+    setActiveGroup(groupId);
     setActiveSlug(null);
     setIsSidebarOpen(false);
   };
@@ -61,6 +71,7 @@ export default function LandingPage() {
   const selectItem = (doc: ComponentDoc) => {
     setActiveCategory(doc.category);
     setActiveSlug(doc.slug);
+    setActiveGroup(doc.group ?? null);
     setIsSidebarOpen(false);
   };
 
@@ -68,18 +79,22 @@ export default function LandingPage() {
     return (
       componentDocs?.filter((doc) => {
         const matchesCategory = activeCategory ? doc.category === activeCategory : true;
+        const matchesGroup = activeGroup ? doc.group === activeGroup : true;
         const matchesSlug = activeSlug ? doc.slug === activeSlug : true;
+        // When a group is selected without a slug, show every card in that group
+        const slugOk = activeSlug ? matchesSlug : true;
         const q = searchQuery.toLowerCase();
         const matchesSearch =
           !q ||
           doc.name.toLowerCase().includes(q) ||
           doc.description.toLowerCase().includes(q) ||
           doc.category.toLowerCase().includes(q) ||
-          doc.slug.toLowerCase().includes(q);
-        return matchesCategory && matchesSlug && matchesSearch;
+          doc.slug.toLowerCase().includes(q) ||
+          (doc.groupLabel?.toLowerCase().includes(q) ?? false);
+        return matchesCategory && matchesGroup && slugOk && matchesSearch;
       }) || []
     );
-  }, [activeCategory, activeSlug, searchQuery]);
+  }, [activeCategory, activeSlug, activeGroup, searchQuery]);
 
   const getCategoryCount = (categoryId: string) =>
     componentDocs?.filter((d) => d.category === categoryId).length || 0;
@@ -213,44 +228,96 @@ export default function LandingPage() {
                 <span className="font-mono text-[9px] text-[var(--text-3)]">{getCategoryCount(section.id)}</span>
               </button>
               <ul className="space-y-0.5">
-                {items.map((doc) => {
-                  const itemActive = activeSlug === doc.slug;
+                {(() => {
+                  const ungrouped = items.filter((d) => !d.group);
+                  const groups = new Map<string, { label: string; docs: ComponentDoc[] }>();
+                  for (const doc of items) {
+                    if (!doc.group) continue;
+                    const existing = groups.get(doc.group);
+                    if (existing) existing.docs.push(doc);
+                    else groups.set(doc.group, { label: doc.groupLabel || doc.group, docs: [doc] });
+                  }
+
                   return (
-                    <li key={doc.slug}>
-                      <button
-                        type="button"
-                        onClick={() => selectItem(doc)}
-                        className={cn(
-                          'w-full flex items-center justify-between px-2.5 py-1.5 transition-colors group',
-                          itemActive
-                            ? 'bg-[rgba(255,176,32,0.12)] text-[var(--accent)]'
-                            : 'text-[var(--text-2)] hover:bg-[var(--surface-2)]'
-                        )}
-                      >
-                        <span className="flex items-center gap-2 min-w-0">
-                          <span
-                            className={cn(
-                              'text-[9px]',
-                              itemActive ? 'text-[var(--accent)]' : 'text-[var(--text-3)]'
-                            )}
-                          >
-                            ▸
-                          </span>
-                          <span
-                            className={cn(
-                              'font-pixel text-[12px] truncate',
-                              itemActive
-                                ? 'text-[var(--accent)]'
-                                : 'text-[var(--text-2)] group-hover:text-[var(--text)]'
-                            )}
-                          >
-                            {doc.name}
-                          </span>
-                        </span>
-                      </button>
-                    </li>
+                    <>
+                      {ungrouped.map((doc) => {
+                        const itemActive = activeSlug === doc.slug;
+                        return (
+                          <li key={doc.slug}>
+                            <button
+                              type="button"
+                              onClick={() => selectItem(doc)}
+                              className={cn(
+                                'w-full flex items-center justify-between px-2.5 py-1.5 transition-colors group',
+                                itemActive
+                                  ? 'bg-[rgba(255,176,32,0.12)] text-[var(--accent)]'
+                                  : 'text-[var(--text-2)] hover:bg-[var(--surface-2)]'
+                              )}
+                            >
+                              <span className="flex items-center gap-2 min-w-0">
+                                <span className={cn('text-[9px]', itemActive ? 'text-[var(--accent)]' : 'text-[var(--text-3)]')}>▸</span>
+                                <span
+                                  className={cn(
+                                    'font-pixel text-[12px] truncate',
+                                    itemActive ? 'text-[var(--accent)]' : 'text-[var(--text-2)] group-hover:text-[var(--text)]'
+                                  )}
+                                >
+                                  {doc.name}
+                                </span>
+                              </span>
+                            </button>
+                          </li>
+                        );
+                      })}
+
+                      {[...groups.entries()].map(([groupId, group]) => {
+                        const groupSelected = activeGroup === groupId && !activeSlug;
+                        return (
+                          <li key={groupId} className="mt-1">
+                            <button
+                              type="button"
+                              onClick={() => selectGroup(groupId, section.id)}
+                              className={cn(
+                                'w-full flex items-center justify-between px-2.5 py-1.5 transition-colors',
+                                groupSelected || activeGroup === groupId
+                                  ? 'bg-[rgba(255,176,32,0.12)] text-[var(--accent)]'
+                                  : 'text-[var(--text-2)] hover:bg-[var(--surface-2)]'
+                              )}
+                            >
+                              <span className="flex items-center gap-2">
+                                <span className="text-[9px]">▾</span>
+                                <span className="font-pixel text-[12px]">{group.label}</span>
+                              </span>
+                              <span className="font-mono text-[9px] text-[var(--text-3)]">{group.docs.length}</span>
+                            </button>
+                            <ul className="mt-0.5 ml-2 border-l border-[var(--border)] pl-1 space-y-0.5">
+                              {group.docs.map((doc) => {
+                                const itemActive = activeSlug === doc.slug;
+                                return (
+                                  <li key={doc.slug}>
+                                    <button
+                                      type="button"
+                                      onClick={() => selectItem(doc)}
+                                      className={cn(
+                                        'w-full flex items-center gap-2 px-2 py-1.5 transition-colors text-left',
+                                        itemActive
+                                          ? 'bg-[rgba(255,176,32,0.12)] text-[var(--accent)]'
+                                          : 'text-[var(--text-3)] hover:text-[var(--text)] hover:bg-[var(--surface-2)]'
+                                      )}
+                                    >
+                                      <span className="text-[8px]">▸</span>
+                                      <span className="font-pixel text-[11px] truncate">{doc.name}</span>
+                                    </button>
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                          </li>
+                        );
+                      })}
+                    </>
                   );
-                })}
+                })()}
               </ul>
             </div>
           );
@@ -373,14 +440,19 @@ export default function LandingPage() {
             <span className="font-pixel text-[10px] text-[var(--text-3)]">Bit · working</span>
           </div>
         );
-      case 'Volt':
-        return (
-          <div className="flex flex-col items-center justify-center gap-3 scale-125">
-            <PixelPersonality name="volt" mood="wave" size={7} />
-            <span className="font-pixel text-[10px] text-[var(--text-3)]">Volt · wave</span>
-          </div>
-        );
       default:
+        if (doc.personality && doc.mood) {
+          return (
+            <div className="flex flex-col items-center justify-center gap-3 scale-125">
+              <PixelPersonality
+                name={doc.personality}
+                mood={doc.mood as 'idle' | 'working' | 'think' | 'celebrate' | 'error' | 'wave' | 'flex' | 'dash'}
+                size={7}
+              />
+              <span className="font-pixel text-[10px] text-[var(--text-3)]">{doc.name}</span>
+            </div>
+          );
+        }
         return (
           <div className="flex items-center justify-center h-full">
             <span className="font-pixel text-xs text-[var(--text-3)]">Preview available</span>
@@ -519,7 +591,7 @@ export default function LandingPage() {
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="font-pixel text-[13px] text-[var(--text)]">{doc.name}</h3>
                       <span className="font-mono text-[9px] uppercase px-1.5 py-0.5 border border-[var(--accent)] text-[var(--accent)] bg-[rgba(255,176,32,0.1)]">
-                        {doc.category}
+                        {doc.groupLabel || doc.category}
                       </span>
                     </div>
                     <p className="font-sans text-[12px] text-[var(--text-3)] line-clamp-2 leading-relaxed">
@@ -536,10 +608,22 @@ export default function LandingPage() {
                       <span>▸</span> Preview
                     </Link>
                     <button 
-                      onClick={() => setCodeModalDoc(doc)}
-                      className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-[11px] font-pixel text-[var(--text-2)] hover:text-[var(--accent)] hover:bg-[var(--surface-2)] transition-colors"
+                      onClick={() => {
+                        setCodeModalDoc(doc);
+                      }}
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-[11px] font-pixel text-[var(--text-2)] hover:text-[var(--accent)] hover:bg-[var(--surface-2)] transition-colors border-r border-[var(--border)]"
                     >
                       <span>◧</span> View Code
+                    </button>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(doc.code).then(() => {
+                          toast(`Copied ${doc.name}`);
+                        });
+                      }}
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-[11px] font-pixel text-[var(--text-2)] hover:text-[var(--accent)] hover:bg-[var(--surface-2)] transition-colors"
+                    >
+                      <span>▣</span> Copy
                     </button>
                   </div>
 

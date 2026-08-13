@@ -4,9 +4,31 @@ import Link from "next/link";
 import type { ComponentDoc } from "@/lib/component-docs";
 import { CodeBlock } from "@/components/ui/code-block";
 import { PixelButton, PixelBadge, PixelCard, PixelWindow, PixelLoader, PixelInput } from "@/components/ui";
-import { Mascot, PixelCreature, PixelPersonality, MASCOT_PALETTE, MASCOT_BASE, MASCOT_FRAMES } from "@/components/mascot";
+import { Mascot, PixelCreature, PixelPersonality, MASCOT_PALETTE, MASCOT_BASE, MASCOT_FRAMES, type PersonalityMood } from "@/components/mascot";
 
-function ComponentPreview({ slug }: { slug: string }) {
+const VOLT_SLUG_MOOD: Record<string, PersonalityMood> = {
+  "volt-idle": "idle",
+  "volt-wave": "wave",
+  "volt-train": "working",
+  "volt-think": "think",
+  "volt-dash": "dash",
+  "volt-flex": "flex",
+  "volt-celebrate": "celebrate",
+  "volt-error": "error",
+};
+
+function ComponentPreview({ slug, mood, personality }: { slug: string; mood?: string; personality?: string }) {
+  if (personality && mood) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-4 py-6">
+        <PixelPersonality name={personality} mood={mood as PersonalityMood} size={8} />
+        <p className="text-xs uppercase" style={{ fontFamily: "var(--font-pixel)", color: "var(--text-3)" }}>
+          {slug}
+        </p>
+      </div>
+    );
+  }
+
   switch (slug) {
     case "pixel-button":
       return (
@@ -131,30 +153,27 @@ function ComponentPreview({ slug }: { slug: string }) {
     case "bit":
       return (
         <div className="flex flex-wrap gap-8 items-end justify-center">
-          {(["idle", "working", "think", "celebrate", "error"] as const).map((mood) => (
-            <div key={mood} className="text-center">
-              <PixelPersonality name="bit" mood={mood} size={6} />
+          {(["idle", "working", "think", "celebrate", "error"] as const).map((m) => (
+            <div key={m} className="text-center">
+              <PixelPersonality name="bit" mood={m} size={6} />
               <p className="mt-3 text-xs uppercase" style={{ fontFamily: "var(--font-pixel)", color: "var(--text-3)" }}>
-                {mood}
-              </p>
-            </div>
-          ))}
-        </div>
-      );
-    case "volt":
-      return (
-        <div className="flex flex-wrap gap-6 items-end justify-center">
-          {(["idle", "wave", "working", "think", "dash", "flex", "celebrate", "error"] as const).map((mood) => (
-            <div key={mood} className="text-center">
-              <PixelPersonality name="volt" mood={mood} size={5} />
-              <p className="mt-3 text-xs uppercase" style={{ fontFamily: "var(--font-pixel)", color: "var(--text-3)" }}>
-                {mood}
+                {m}
               </p>
             </div>
           ))}
         </div>
       );
     default:
+      if (VOLT_SLUG_MOOD[slug]) {
+        return (
+          <div className="flex flex-col items-center justify-center gap-4 py-6">
+            <PixelPersonality name="volt" mood={VOLT_SLUG_MOOD[slug]} size={8} />
+            <p className="text-xs uppercase" style={{ fontFamily: "var(--font-pixel)", color: "var(--text-3)" }}>
+              {slug}
+            </p>
+          </div>
+        );
+      }
       return (
         <div className="flex items-center justify-center p-8">
           <p className="text-sm" style={{ fontFamily: "var(--font-pixel)", color: "var(--text-3)" }}>
@@ -227,7 +246,7 @@ export function DocPageClient({ doc }: { doc: ComponentDoc }) {
           </h2>
           <PixelWindow title={`${doc.slug}_preview.tsx`}>
             <div className="py-4">
-              <ComponentPreview slug={doc.slug} />
+              <ComponentPreview slug={doc.slug} mood={doc.mood} personality={doc.personality} />
             </div>
           </PixelWindow>
         </div>
