@@ -20,7 +20,7 @@ export const librarySections: LibrarySection[] = [
   {
     id: 'mascot',
     label: 'MASCOTS',
-    description: 'Creatures, personalities, and living UI actors',
+    description: 'Creatures & named personalities (Bit, Volt, …)',
     icon: '◈',
   },
   {

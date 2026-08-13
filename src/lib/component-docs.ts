@@ -201,16 +201,15 @@ const palette = [
 <Mascot animation="error" size={10} />`,
   },
   {
-    slug: "pixel-personality",
-    name: "PixelPersonality",
+    slug: "bit",
+    name: "Bit",
     description:
-      "Drop-in RetroChunk personalities with product moods — idle, working, think, celebrate, error. Start with Bit (original amber antenna buddy).",
+      "Amber UI buddy with a cyan caret — big readable shapes. Moods: idle, working (desk + laptop), think, celebrate, error. Add more Bit behaviors under this personality over time.",
     category: "mascot",
     props: [
-      { name: "name", type: "'bit' | string", default: "'bit'", description: "Personality preset id." },
-      { name: "mood", type: "'idle' | 'working' | 'think' | 'celebrate' | 'error'", default: "'idle'", description: "Animation mood for UI state." },
+      { name: "name", type: "'bit'", default: "'bit'", description: "Personality id." },
+      { name: "mood", type: "'idle' | 'working' | 'think' | 'celebrate' | 'error'", default: "'idle'", description: "Behaviour / emotion." },
       { name: "size", type: "number", default: "8", description: "Pixel size of each cell." },
-      { name: "gridLines", type: "boolean", default: "false", description: "Show debug grid lines." },
       { name: "className", type: "string", description: "Additional CSS classes." },
     ],
     code: `import { PixelPersonality } from "@/components/mascot";
@@ -219,6 +218,25 @@ const palette = [
 <PixelPersonality name="bit" mood="working" size={8} />
 <PixelPersonality name="bit" mood="celebrate" size={8} />
 <PixelPersonality name="bit" mood="error" size={8} />`,
+  },
+  {
+    slug: "volt",
+    name: "Volt",
+    description:
+      "Original spiky-haired fighter for websites — teal tunic, amber belt, cyan hair tips. Anime energy people love, without using copyrighted characters.",
+    category: "mascot",
+    props: [
+      { name: "name", type: "'volt'", default: "'volt'", description: "Personality id." },
+      { name: "mood", type: "'idle' | 'working' | 'think' | 'celebrate' | 'error'", default: "'idle'", description: "Behaviour / emotion." },
+      { name: "size", type: "number", default: "8", description: "Pixel size of each cell." },
+      { name: "className", type: "string", description: "Additional CSS classes." },
+    ],
+    code: `import { PixelPersonality } from "@/components/mascot";
+
+<PixelPersonality name="volt" mood="idle" size={8} />
+<PixelPersonality name="volt" mood="celebrate" size={8} />
+<PixelPersonality name="volt" mood="working" size={8} />
+<PixelPersonality name="volt" mood="error" size={8} />`,
   },
   {
     slug: "hero-pixel",

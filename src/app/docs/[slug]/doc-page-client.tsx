@@ -128,11 +128,25 @@ function ComponentPreview({ slug }: { slug: string }) {
         </div>
       );
     case "pixel-personality":
+    case "bit":
       return (
         <div className="flex flex-wrap gap-8 items-end justify-center">
           {(["idle", "working", "think", "celebrate", "error"] as const).map((mood) => (
             <div key={mood} className="text-center">
               <PixelPersonality name="bit" mood={mood} size={6} />
+              <p className="mt-3 text-xs uppercase" style={{ fontFamily: "var(--font-pixel)", color: "var(--text-3)" }}>
+                {mood}
+              </p>
+            </div>
+          ))}
+        </div>
+      );
+    case "volt":
+      return (
+        <div className="flex flex-wrap gap-8 items-end justify-center">
+          {(["idle", "working", "think", "celebrate", "error"] as const).map((mood) => (
+            <div key={mood} className="text-center">
+              <PixelPersonality name="volt" mood={mood} size={6} />
               <p className="mt-3 text-xs uppercase" style={{ fontFamily: "var(--font-pixel)", color: "var(--text-3)" }}>
                 {mood}
               </p>

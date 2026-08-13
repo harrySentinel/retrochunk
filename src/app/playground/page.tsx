@@ -84,8 +84,10 @@ export default function PlaygroundPage() {
                       Compose a pixel login with inputs, buttons, and mascot feedback.
                     </p>
                   </div>
-                  <Mascot animation={mascotMood} size={5} />
-                  <PixelPersonality name="bit" mood={mascotMood === 'celebrate' ? 'celebrate' : mascotMood === 'error' ? 'error' : 'working'} size={5} />
+                  <div className="flex items-end gap-3">
+                    <PixelPersonality name="bit" mood={mascotMood === 'celebrate' ? 'celebrate' : mascotMood === 'error' ? 'error' : 'working'} size={5} />
+                    <PixelPersonality name="volt" mood={mascotMood === 'celebrate' ? 'celebrate' : mascotMood === 'error' ? 'error' : 'working'} size={5} />
+                  </div>
                 </div>
                 <PixelInput
                   label="EMAIL"
