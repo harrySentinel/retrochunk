@@ -209,16 +209,16 @@ const palette = [
     props: [
       { name: "name", type: "'bit' | string", default: "'bit'", description: "Personality preset id." },
       { name: "mood", type: "'idle' | 'working' | 'think' | 'celebrate' | 'error'", default: "'idle'", description: "Animation mood for UI state." },
-      { name: "size", type: "number", default: "6", description: "Pixel size of each cell." },
+      { name: "size", type: "number", default: "8", description: "Pixel size of each cell." },
       { name: "gridLines", type: "boolean", default: "false", description: "Show debug grid lines." },
       { name: "className", type: "string", description: "Additional CSS classes." },
     ],
     code: `import { PixelPersonality } from "@/components/mascot";
 
-<PixelPersonality name="bit" mood="idle" />
-<PixelPersonality name="bit" mood="working" />
-<PixelPersonality name="bit" mood="celebrate" />
-<PixelPersonality name="bit" mood="error" />`,
+<PixelPersonality name="bit" mood="idle" size={8} />
+<PixelPersonality name="bit" mood="working" size={8} />
+<PixelPersonality name="bit" mood="celebrate" size={8} />
+<PixelPersonality name="bit" mood="error" size={8} />`,
   },
   {
     slug: "hero-pixel",

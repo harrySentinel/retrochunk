@@ -23,7 +23,7 @@ export interface PixelPersonalityProps {
 export function PixelPersonality({
   name = 'bit',
   mood = 'idle',
-  size = 6,
+  size = 8,
   gridLines = false,
   className,
   preset: presetProp,
