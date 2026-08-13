@@ -4,7 +4,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import type { ComponentDoc } from "@/lib/component-docs";
 import { CodeBlock } from "@/components/ui/code-block";
-import { PixelButton, PixelBadge, PixelCard, PixelWindow, PixelLoader, PixelInput, PixelDotsLoader, PixelBarLoader, PixelOrbitLoader, PixelStackLoader, PixelScanLoader } from "@/components/ui";
+import { PixelButton, PixelBadge, PixelCard, PixelWindow, PixelLoader, PixelInput, PixelDotsLoader, PixelBarLoader, PixelOrbitLoader, PixelStackLoader, PixelScanLoader, PixelSnakeLoader, PixelHourglassLoader, PixelGlitchLoader, PixelRingLoader, PixelEqualizerLoader, PixelPulseLoader } from "@/components/ui";
 import { Mascot, PixelCreature, PixelPersonality, MASCOT_PALETTE, MASCOT_BASE, MASCOT_FRAMES, type PersonalityMood } from "@/components/mascot";
 
 const VOLT_SLUG_MOOD: Record<string, PersonalityMood> = {
@@ -25,6 +25,12 @@ const LOADER_PREVIEW: Record<string, ReactNode> = {
   orbit: <PixelOrbitLoader size="lg" />,
   stack: <PixelStackLoader size="lg" />,
   scan: <PixelScanLoader size="lg" />,
+  snake: <PixelSnakeLoader size="lg" />,
+  hourglass: <PixelHourglassLoader size="lg" />,
+  glitch: <PixelGlitchLoader size="lg" />,
+  ring: <PixelRingLoader size="lg" />,
+  equalizer: <PixelEqualizerLoader size="lg" />,
+  pulse: <PixelPulseLoader size="lg" />,
 };
 
 function ComponentPreview({ slug, mood, personality, loader }: { slug: string; mood?: string; personality?: string; loader?: string }) {

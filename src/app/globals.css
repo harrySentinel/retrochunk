@@ -20,6 +20,8 @@
   /* Accents */
   --accent: #FFB020;
   --accent-ink: #0C0D10;
+  --accent-soft: rgba(255, 176, 32, 0.12);
+  --accent-border: rgba(255, 176, 32, 0.35);
   --cool: #35C2FF;
   --success: #48D597;
   --danger: #FF5470;
@@ -110,6 +112,91 @@
   100% { top: calc(100% - 3px); opacity: 0.3; }
 }
 
+@keyframes loader-snake {
+  0%, 100% { opacity: 0; }
+  4% { opacity: 1; }
+  8% { opacity: 0; }
+}
+
+@keyframes loader-hour-drain {
+  0%, 8% { opacity: 1; transform: scale(1) translateY(0); }
+  35% { opacity: 0.15; transform: scale(0.55) translateY(2px); }
+  42%, 100% { opacity: 0; transform: scale(0.3) translateY(3px); }
+}
+
+@keyframes loader-hour-fill {
+  0%, 38% { opacity: 0; transform: scale(0.3) translateY(-2px); }
+  55% { opacity: 1; transform: scale(1.08) translateY(0); }
+  62%, 78% { opacity: 1; transform: scale(1) translateY(0); }
+  88%, 100% { opacity: 0; transform: scale(0.3) translateY(-2px); }
+}
+
+@keyframes loader-hour-grain {
+  0% { opacity: 0; transform: translateY(0); }
+  8% { opacity: 0.9; }
+  75% { opacity: 0.9; transform: translateY(calc(var(--hour-fall, 14px))); }
+  100% { opacity: 0; transform: translateY(calc(var(--hour-fall, 14px))); }
+}
+
+@keyframes loader-hour-shell-top {
+  0%, 15% { background: color-mix(in srgb, var(--accent) 28%, var(--border)); }
+  45%, 100% { background: var(--border); }
+}
+
+@keyframes loader-hour-shell-bot {
+  0%, 50% { background: var(--border); }
+  65%, 82% { background: color-mix(in srgb, var(--accent) 38%, var(--border)); }
+  92%, 100% { background: var(--border); }
+}
+
+@keyframes loader-hour-bolt {
+  0%, 100% { background: var(--text-3); opacity: 0.5; }
+  50% { background: var(--accent); opacity: 1; box-shadow: 0 0 3px color-mix(in srgb, var(--accent) 50%, transparent); }
+}
+
+@keyframes loader-hour-flip {
+  0%, 48% { transform: rotate(0deg); }
+  62% { transform: rotate(180deg); }
+  78%, 100% { transform: rotate(360deg); }
+}
+
+@keyframes loader-glitch {
+  0%, 100% { transform: translateX(0); opacity: 0.2; }
+  25% { transform: translateX(4px); opacity: 1; }
+  50% { transform: translateX(-3px); opacity: 0.6; }
+  75% { transform: translateX(2px); opacity: 0.9; }
+}
+
+@keyframes loader-glitch-flash {
+  0%, 100% { opacity: 0.1; }
+  48% { opacity: 0.1; }
+  50% { opacity: 0.35; }
+  52% { opacity: 0.1; }
+}
+
+@keyframes loader-ring-run {
+  0%, 100% { opacity: 0; transform: scale(0.6); }
+  8% { opacity: 1; transform: scale(1); }
+  18% { opacity: 1; transform: scale(1); }
+  26% { opacity: 0; transform: scale(0.6); }
+}
+
+@keyframes loader-ring-core {
+  0%, 100% { transform: scale(1); box-shadow: none; }
+  50% { transform: scale(1.12); box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 45%, transparent); }
+}
+
+@keyframes loader-eq {
+  0%, 100% { transform: scaleY(0.25); opacity: 0.4; }
+  50% { transform: scaleY(1); opacity: 1; }
+}
+
+@keyframes loader-pulse-cell {
+  0%, 100% { opacity: 0.1; transform: scale(0.75); }
+  40% { opacity: 1; transform: scale(1); }
+  70% { opacity: 0.15; transform: scale(0.85); }
+}
+
 @keyframes marquee-scroll {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
@@ -177,6 +264,30 @@ body {
     linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
   background-size: 16px 16px;
+}
+
+/* Unified loader frame — every loader shares this shell */
+.loader-shell {
+  border: 2px solid var(--border);
+  background: var(--surface);
+  box-shadow: 3px 3px 0 color-mix(in srgb, var(--border) 85%, transparent);
+}
+
+/* Gallery / docs preview stage */
+.preview-stage {
+  background-color: var(--surface-2);
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 12px 12px;
+}
+
+.preview-stage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 40%, color-mix(in srgb, var(--bg) 55%, transparent) 100%);
 }
 
 /* Crisp pixel rendering for canvases and images */

@@ -6,7 +6,13 @@ export type LoaderKind =
   | 'bar'
   | 'orbit'
   | 'stack'
-  | 'scan';
+  | 'scan'
+  | 'snake'
+  | 'hourglass'
+  | 'glitch'
+  | 'ring'
+  | 'equalizer'
+  | 'pulse';
 
 export interface LoaderPresetMeta {
   kind: LoaderKind;
@@ -58,6 +64,48 @@ export const loaderPresetMeta: LoaderPresetMeta[] = [
     label: 'Scan',
     description: 'CRT scan beam across a pixel frame — retro boot energy.',
     importName: 'PixelScanLoader',
+  },
+  {
+    kind: 'snake',
+    name: 'loader_snake',
+    label: 'Snake',
+    description: 'A lit pixel races around a square track — arcade chase energy.',
+    importName: 'PixelSnakeLoader',
+  },
+  {
+    kind: 'hourglass',
+    name: 'loader_hourglass',
+    label: 'Hourglass',
+    description: 'Sand drains through the neck, fills the bottom chamber, then flips to reset.',
+    importName: 'PixelHourglassLoader',
+  },
+  {
+    kind: 'glitch',
+    name: 'loader_glitch',
+    label: 'Glitch',
+    description: 'Jittery CRT bars with screen flash — corrupted boot sequence vibes.',
+    importName: 'PixelGlitchLoader',
+  },
+  {
+    kind: 'ring',
+    name: 'loader_ring',
+    label: 'Ring',
+    description: 'Square-orbit tracker — one pixel chases the ring path while the core pulses.',
+    importName: 'PixelRingLoader',
+  },
+  {
+    kind: 'equalizer',
+    name: 'loader_equalizer',
+    label: 'Equalizer',
+    description: 'Bouncing audio bars in a pixel frame — loading with rhythm.',
+    importName: 'PixelEqualizerLoader',
+  },
+  {
+    kind: 'pulse',
+    name: 'loader_pulse',
+    label: 'Pulse',
+    description: '9×9 pixel grid — concentric rings flash outward from the center like a radar ping.',
+    importName: 'PixelPulseLoader',
   },
 ];
 

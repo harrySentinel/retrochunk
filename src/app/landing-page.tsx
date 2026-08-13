@@ -4,7 +4,7 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { componentDocs, type ComponentDoc } from '@/lib/component-docs';
 import { librarySections } from '@/lib/library-sections';
-import { PixelButton, PixelCard, PixelBadge, PixelWindow, PixelInput, PixelLoader, PixelDotsLoader, PixelBarLoader, PixelOrbitLoader, PixelStackLoader, PixelScanLoader } from '@/components/ui';
+import { PixelButton, PixelCard, PixelBadge, PixelWindow, PixelInput, PixelLoader, PixelDotsLoader, PixelBarLoader, PixelOrbitLoader, PixelStackLoader, PixelScanLoader, PixelSnakeLoader, PixelHourglassLoader, PixelGlitchLoader, PixelRingLoader, PixelEqualizerLoader, PixelPulseLoader } from '@/components/ui';
 import {
   Mascot,
   PixelCreature,
@@ -449,12 +449,17 @@ export default function LandingPage() {
             orbit: <PixelOrbitLoader size="md" />,
             stack: <PixelStackLoader size="md" />,
             scan: <PixelScanLoader size="md" />,
+            snake: <PixelSnakeLoader size="md" />,
+            hourglass: <PixelHourglassLoader size="md" />,
+            glitch: <PixelGlitchLoader size="md" />,
+            ring: <PixelRingLoader size="md" />,
+            equalizer: <PixelEqualizerLoader size="md" />,
+            pulse: <PixelPulseLoader size="md" />,
           } as const;
           const node = loaders[doc.loader as keyof typeof loaders] ?? <PixelLoader />;
           return (
-            <div className="flex flex-col items-center justify-center gap-3">
+            <div className="flex flex-col items-center justify-center gap-2 w-full h-full min-h-[120px]">
               {node}
-              <span className="font-pixel text-[10px] text-[var(--text-3)]">{doc.name}</span>
             </div>
           );
         }
@@ -539,8 +544,9 @@ export default function LandingPage() {
         </header>
 
         {/* Hero Section */}
-        <section className="px-4 py-8 sm:px-8 sm:py-10 md:p-[44px_32px_28px] border-b border-[var(--border)] shrink-0 bg-[var(--bg)]">
-          <div className="max-w-4xl">
+        <section className="relative px-4 py-8 sm:px-8 sm:py-10 md:p-[44px_32px_28px] border-b border-[var(--border)] shrink-0 bg-[var(--bg)] pixel-grid overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[var(--bg)] pointer-events-none" />
+          <div className="relative max-w-4xl">
             <div className="font-pixel text-[10px] uppercase tracking-widest text-[var(--text-3)] mb-4 sm:mb-6">
               RETROCHUNK · V0.1 · {componentDocs?.length || 0} COMPONENTS
             </div>
@@ -588,17 +594,18 @@ export default function LandingPage() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-[14px]">
               {filteredDocs.map((doc) => (
-                <div key={doc.name} className="group flex flex-col bg-[var(--surface)] border border-[var(--border)] hover:border-[rgba(255,176,32,0.4)] transition-colors overflow-hidden">
+                <div
+                  key={doc.name}
+                  className="group flex flex-col bg-[var(--surface)] border border-[var(--border)] hover:border-[var(--accent-border)] hover:shadow-[4px_4px_0_var(--accent-soft)] transition-all duration-200 overflow-hidden"
+                >
                   
                   {/* Preview Area */}
-                  <div className="relative w-full aspect-[4/3] bg-[#0f0f0f] border-b border-[var(--border)] flex items-center justify-center p-4 overflow-hidden">
-                    <div className="absolute top-2 right-2 flex items-center gap-1.5 bg-[var(--surface-2)] border border-[var(--border)] px-1.5 py-0.5 z-10">
+                  <div className="preview-stage relative w-full aspect-[4/3] border-b border-[var(--border)] flex items-center justify-center p-6 overflow-hidden">
+                    <div className="absolute top-2 right-2 flex items-center gap-1.5 bg-[var(--surface)]/90 border border-[var(--border)] px-1.5 py-0.5 z-10 backdrop-blur-sm">
                       <div className="w-1.5 h-1.5 bg-[var(--success)] animate-pulse" />
                       <span className="font-pixel text-[8px] text-[var(--text-2)]">LIVE</span>
                     </div>
-                    {/* Pattern background overlay */}
-                    <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(var(--text) 1px, transparent 1px)', backgroundSize: '12px 12px' }} />
-                    <div className="relative z-0 w-full h-full flex items-center justify-center">
+                    <div className="relative z-[1] w-full h-full flex items-center justify-center">
                       {renderPreview(doc)}
                     </div>
                   </div>
