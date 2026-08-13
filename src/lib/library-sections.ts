@@ -1,6 +1,6 @@
 import type { ComponentDoc } from './component-docs';
 
-export type LibrarySectionId = 'primitive' | 'mascot' | 'block';
+export type LibrarySectionId = 'primitive' | 'mascot' | 'loader' | 'block';
 
 export interface LibrarySection {
   id: LibrarySectionId;
@@ -16,6 +16,12 @@ export const librarySections: LibrarySection[] = [
     label: 'PRIMITIVES',
     description: 'Buttons, inputs, cards, and building blocks',
     icon: '▣',
+  },
+  {
+    id: 'loader',
+    label: 'LOADERS',
+    description: 'Pixel loading animations — grid, dots, bar, orbit, and more',
+    icon: '◌',
   },
   {
     id: 'mascot',

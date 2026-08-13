@@ -4,7 +4,7 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { componentDocs, type ComponentDoc } from '@/lib/component-docs';
 import { librarySections } from '@/lib/library-sections';
-import { PixelButton, PixelCard, PixelBadge, PixelWindow, PixelLoader, PixelInput } from '@/components/ui';
+import { PixelButton, PixelCard, PixelBadge, PixelWindow, PixelInput, PixelLoader, PixelDotsLoader, PixelBarLoader, PixelOrbitLoader, PixelStackLoader, PixelScanLoader } from '@/components/ui';
 import {
   Mascot,
   PixelCreature,
@@ -441,6 +441,23 @@ export default function LandingPage() {
           </div>
         );
       default:
+        if (doc.loader) {
+          const loaders = {
+            grid: <PixelLoader size="md" />,
+            dots: <PixelDotsLoader size="md" />,
+            bar: <PixelBarLoader size="md" />,
+            orbit: <PixelOrbitLoader size="md" />,
+            stack: <PixelStackLoader size="md" />,
+            scan: <PixelScanLoader size="md" />,
+          } as const;
+          const node = loaders[doc.loader as keyof typeof loaders] ?? <PixelLoader />;
+          return (
+            <div className="flex flex-col items-center justify-center gap-3">
+              {node}
+              <span className="font-pixel text-[10px] text-[var(--text-3)]">{doc.name}</span>
+            </div>
+          );
+        }
         if (doc.personality && doc.mood) {
           return (
             <div className="flex flex-col items-center justify-center gap-3 scale-125">

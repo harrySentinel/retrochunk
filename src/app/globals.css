@@ -83,6 +83,33 @@
   50% { opacity: 1; }
 }
 
+@keyframes loader-bounce {
+  0%, 100% { transform: translateY(0); opacity: 0.45; }
+  50% { transform: translateY(-8px); opacity: 1; }
+}
+
+@keyframes loader-bar-seg {
+  0%, 100% { opacity: 0.15; }
+  40%, 60% { opacity: 1; }
+}
+
+@keyframes loader-orbit-dot {
+  0%, 100% { opacity: 0.2; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+@keyframes loader-stack {
+  0%, 100% { opacity: 0.2; transform: translateY(4px); }
+  50% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes loader-scan {
+  0% { top: 0; opacity: 0.3; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: calc(100% - 3px); opacity: 0.3; }
+}
+
 @keyframes marquee-scroll {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }

@@ -2,13 +2,15 @@ export interface ComponentDoc {
   slug: string;
   name: string;
   description: string;
-  category: "primitive" | "mascot" | "block";
+  category: "primitive" | "mascot" | "block" | "loader";
   /** Optional nest under a personality pack in the sidebar (e.g. "volt") */
   group?: string;
   groupLabel?: string;
   /** Personality mood for live previews */
   mood?: string;
   personality?: string;
+  /** Loader variant for live previews */
+  loader?: string;
   props: PropDef[];
   code: string;
 }
@@ -21,6 +23,7 @@ export interface PropDef {
 }
 
 import { voltPresetDocs } from "./volt-presets";
+import { loaderPresetDocs } from "./loader-presets";
 
 export const componentDocs: ComponentDoc[] = [
   {
@@ -121,22 +124,6 @@ export const componentDocs: ComponentDoc[] = [
 </PixelWindow>`,
   },
   {
-    slug: "pixel-loader",
-    name: "PixelLoader",
-    description:
-      "A 4×4 grid loader with a diagonal wave animation. Perfect for loading states.",
-    category: "primitive",
-    props: [
-      { name: "size", type: "'sm' | 'md' | 'lg'", default: "'md'", description: "Loader cell size." },
-      { name: "className", type: "string", description: "Additional CSS classes." },
-    ],
-    code: `import { PixelLoader } from "@/components/ui";
-
-<PixelLoader size="sm" />
-<PixelLoader size="md" />
-<PixelLoader size="lg" />`,
-  },
-  {
     slug: "pixel-input",
     name: "PixelInput",
     description:
@@ -228,6 +215,7 @@ const palette = [
 <PixelPersonality name="bit" mood="error" size={8} />`,
   },
   ...voltPresetDocs,
+  ...loaderPresetDocs,
   {
     slug: "hero-pixel",
     name: "HeroPixel",

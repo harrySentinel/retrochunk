@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import type { ReactNode } from "react";
 import type { ComponentDoc } from "@/lib/component-docs";
 import { CodeBlock } from "@/components/ui/code-block";
-import { PixelButton, PixelBadge, PixelCard, PixelWindow, PixelLoader, PixelInput } from "@/components/ui";
+import { PixelButton, PixelBadge, PixelCard, PixelWindow, PixelLoader, PixelInput, PixelDotsLoader, PixelBarLoader, PixelOrbitLoader, PixelStackLoader, PixelScanLoader } from "@/components/ui";
 import { Mascot, PixelCreature, PixelPersonality, MASCOT_PALETTE, MASCOT_BASE, MASCOT_FRAMES, type PersonalityMood } from "@/components/mascot";
 
 const VOLT_SLUG_MOOD: Record<string, PersonalityMood> = {
@@ -17,11 +18,31 @@ const VOLT_SLUG_MOOD: Record<string, PersonalityMood> = {
   "volt-error": "error",
 };
 
-function ComponentPreview({ slug, mood, personality }: { slug: string; mood?: string; personality?: string }) {
+const LOADER_PREVIEW: Record<string, ReactNode> = {
+  grid: <PixelLoader size="lg" />,
+  dots: <PixelDotsLoader size="lg" />,
+  bar: <PixelBarLoader size="lg" />,
+  orbit: <PixelOrbitLoader size="lg" />,
+  stack: <PixelStackLoader size="lg" />,
+  scan: <PixelScanLoader size="lg" />,
+};
+
+function ComponentPreview({ slug, mood, personality, loader }: { slug: string; mood?: string; personality?: string; loader?: string }) {
   if (personality && mood) {
     return (
       <div className="flex flex-col items-center justify-center gap-4 py-6">
         <PixelPersonality name={personality} mood={mood as PersonalityMood} size={8} />
+        <p className="text-xs uppercase" style={{ fontFamily: "var(--font-pixel)", color: "var(--text-3)" }}>
+          {slug}
+        </p>
+      </div>
+    );
+  }
+
+  if (loader && LOADER_PREVIEW[loader]) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-4 py-8">
+        {LOADER_PREVIEW[loader]}
         <p className="text-xs uppercase" style={{ fontFamily: "var(--font-pixel)", color: "var(--text-3)" }}>
           {slug}
         </p>
@@ -188,6 +209,7 @@ export function DocPageClient({ doc }: { doc: ComponentDoc }) {
   const categoryColors: Record<string, string> = {
     primitive: "var(--accent)",
     mascot: "var(--cool)",
+    loader: "var(--cool)",
     block: "var(--success)",
   };
 
@@ -226,9 +248,15 @@ export function DocPageClient({ doc }: { doc: ComponentDoc }) {
               {doc.name}
             </h1>
             <PixelBadge
-              variant={doc.category === "primitive" ? "default" : doc.category === "mascot" ? "cool" : "success"}
+              variant={
+                doc.category === "primitive"
+                  ? "default"
+                  : doc.category === "mascot" || doc.category === "loader"
+                    ? "cool"
+                    : "success"
+              }
             >
-              {doc.category}
+              {doc.groupLabel || doc.category}
             </PixelBadge>
           </div>
           <p className="text-base max-w-2xl" style={{ color: "var(--text-2)" }}>
@@ -246,7 +274,7 @@ export function DocPageClient({ doc }: { doc: ComponentDoc }) {
           </h2>
           <PixelWindow title={`${doc.slug}_preview.tsx`}>
             <div className="py-4">
-              <ComponentPreview slug={doc.slug} mood={doc.mood} personality={doc.personality} />
+              <ComponentPreview slug={doc.slug} mood={doc.mood} personality={doc.personality} loader={doc.loader} />
             </div>
           </PixelWindow>
         </div>
