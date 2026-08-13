@@ -85,7 +85,7 @@ export default function PlaygroundPage() {
                     </p>
                   </div>
                   <Mascot animation={mascotMood} size={5} />
-                  <PixelPersonality name="bit" mood={mascotMood === 'celebrate' ? 'celebrate' : mascotMood === 'error' ? 'error' : 'working'} size={4} />
+                  <PixelPersonality name="bit" mood={mascotMood === 'celebrate' ? 'celebrate' : mascotMood === 'error' ? 'error' : 'working'} size={3} />
                 </div>
                 <PixelInput
                   label="EMAIL"
