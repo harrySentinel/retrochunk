@@ -86,7 +86,7 @@ export default function PlaygroundPage() {
                   </div>
                   <div className="flex items-end gap-3">
                     <PixelPersonality name="bit" mood={mascotMood === 'celebrate' ? 'celebrate' : mascotMood === 'error' ? 'error' : 'working'} size={5} />
-                    <PixelPersonality name="volt" mood={mascotMood === 'celebrate' ? 'celebrate' : mascotMood === 'error' ? 'error' : 'working'} size={5} />
+                    <PixelPersonality name="volt" mood={mascotMood === 'celebrate' ? 'celebrate' : mascotMood === 'error' ? 'error' : 'wave'} size={5} />
                   </div>
                 </div>
                 <PixelInput

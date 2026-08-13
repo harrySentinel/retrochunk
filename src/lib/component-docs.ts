@@ -223,20 +223,26 @@ const palette = [
     slug: "volt",
     name: "Volt",
     description:
-      "Original spiky-haired fighter for websites — teal tunic, amber belt, cyan hair tips. Anime energy people love, without using copyrighted characters.",
+      "Soft-haired RetroChunk character — teal tunic, amber belt, cyan streak. Behaviours: idle, wave, train, think, dash, flex, celebrate, error.",
     category: "mascot",
     props: [
       { name: "name", type: "'volt'", default: "'volt'", description: "Personality id." },
-      { name: "mood", type: "'idle' | 'working' | 'think' | 'celebrate' | 'error'", default: "'idle'", description: "Behaviour / emotion." },
+      {
+        name: "mood",
+        type: "'idle' | 'wave' | 'working' | 'think' | 'dash' | 'flex' | 'celebrate' | 'error'",
+        default: "'idle'",
+        description: "Behaviour / emotion.",
+      },
       { name: "size", type: "number", default: "8", description: "Pixel size of each cell." },
       { name: "className", type: "string", description: "Additional CSS classes." },
     ],
     code: `import { PixelPersonality } from "@/components/mascot";
 
 <PixelPersonality name="volt" mood="idle" size={8} />
-<PixelPersonality name="volt" mood="celebrate" size={8} />
-<PixelPersonality name="volt" mood="working" size={8} />
-<PixelPersonality name="volt" mood="error" size={8} />`,
+<PixelPersonality name="volt" mood="wave" size={8} />
+<PixelPersonality name="volt" mood="dash" size={8} />
+<PixelPersonality name="volt" mood="flex" size={8} />
+<PixelPersonality name="volt" mood="celebrate" size={8} />`,
   },
   {
     slug: "hero-pixel",

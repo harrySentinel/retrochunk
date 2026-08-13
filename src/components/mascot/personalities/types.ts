@@ -1,4 +1,12 @@
-export type PersonalityMood = 'idle' | 'working' | 'celebrate' | 'error' | 'think';
+export type PersonalityMood =
+  | 'idle'
+  | 'working'
+  | 'celebrate'
+  | 'error'
+  | 'think'
+  | 'wave'
+  | 'flex'
+  | 'dash';
 
 export interface PersonalityFrame {
   hold: number;

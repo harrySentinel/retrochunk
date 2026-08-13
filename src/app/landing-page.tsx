@@ -376,8 +376,8 @@ export default function LandingPage() {
       case 'Volt':
         return (
           <div className="flex flex-col items-center justify-center gap-3 scale-125">
-            <PixelPersonality name="volt" mood="celebrate" size={7} />
-            <span className="font-pixel text-[10px] text-[var(--text-3)]">Volt · celebrate</span>
+            <PixelPersonality name="volt" mood="wave" size={7} />
+            <span className="font-pixel text-[10px] text-[var(--text-3)]">Volt · wave</span>
           </div>
         );
       default:
