@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import type { ComponentDoc } from "@/lib/component-docs";
 import { CodeBlock } from "@/components/ui/code-block";
 import { PixelButton, PixelBadge, PixelCard, PixelWindow, PixelLoader, PixelInput, PixelDotsLoader, PixelBarLoader, PixelOrbitLoader, PixelStackLoader, PixelScanLoader, PixelSnakeLoader, PixelHourglassLoader, PixelGlitchLoader, PixelRingLoader, PixelEqualizerLoader, PixelPulseLoader } from "@/components/ui";
+import { HeroDotMorph, HeroDotSection, HeroPixel, TestimonialsPixel, DashboardPixel } from "@/components/blocks";
 import { Mascot, PixelCreature, PixelPersonality, MASCOT_PALETTE, MASCOT_BASE, MASCOT_FRAMES, type PersonalityMood } from "@/components/mascot";
 
 const VOLT_SLUG_MOOD: Record<string, PersonalityMood> = {
@@ -190,6 +191,45 @@ function ComponentPreview({ slug, mood, personality, loader }: { slug: string; m
           ))}
         </div>
       );
+    case "hero-dot-section":
+      return (
+        <div className="w-full overflow-hidden rounded" style={{ height: 520 }}>
+          <div style={{ transform: 'scale(0.7)', transformOrigin: 'top left', width: '143%', height: '143%' }}>
+            <HeroDotSection />
+          </div>
+        </div>
+      );
+    case "hero-dot-morph":
+      return (
+        <div className="w-full overflow-hidden" style={{ height: 480, background: '#FAF8F5' }}>
+          <HeroDotMorph />
+        </div>
+      );
+    case "hero-pixel":
+      return (
+        <div className="w-full overflow-hidden" style={{ height: 480 }}>
+          <HeroPixel
+            title="Build Retro UIs"
+            subtitle="Pixel-art components for modern React apps."
+            ctaText="Get Started"
+            ctaHref="#"
+            secondaryText="View GitHub"
+            secondaryHref="#"
+          />
+        </div>
+      );
+    case "testimonials-pixel":
+      return (
+        <div className="w-full overflow-hidden" style={{ height: 320 }}>
+          <TestimonialsPixel />
+        </div>
+      );
+    case "dashboard-pixel":
+      return (
+        <div className="w-full overflow-auto" style={{ height: 500 }}>
+          <DashboardPixel />
+        </div>
+      );
     default:
       if (VOLT_SLUG_MOOD[slug]) {
         return (
@@ -216,6 +256,7 @@ export function DocPageClient({ doc }: { doc: ComponentDoc }) {
     primitive: "var(--accent)",
     mascot: "var(--cool)",
     loader: "var(--cool)",
+    hero: "var(--accent)",
     block: "var(--success)",
   };
 
@@ -259,7 +300,9 @@ export function DocPageClient({ doc }: { doc: ComponentDoc }) {
                   ? "default"
                   : doc.category === "mascot" || doc.category === "loader"
                     ? "cool"
-                    : "success"
+                    : doc.category === "hero"
+                      ? "default"
+                      : "success"
               }
             >
               {doc.groupLabel || doc.category}

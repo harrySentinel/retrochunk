@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { componentDocs, type ComponentDoc } from '@/lib/component-docs';
 import { librarySections } from '@/lib/library-sections';
 import { PixelButton, PixelCard, PixelBadge, PixelWindow, PixelInput, PixelLoader, PixelDotsLoader, PixelBarLoader, PixelOrbitLoader, PixelStackLoader, PixelScanLoader, PixelSnakeLoader, PixelHourglassLoader, PixelGlitchLoader, PixelRingLoader, PixelEqualizerLoader, PixelPulseLoader } from '@/components/ui';
+import { HeroDotMorph, HeroDotSection, HeroPixel, TestimonialsPixel, DashboardPixel } from '@/components/blocks';
 import {
   Mascot,
   PixelCreature,
@@ -23,6 +24,7 @@ export default function LandingPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
   const [codeModalDoc, setCodeModalDoc] = useState<ComponentDoc | null>(null);
   const { toast } = useToast();
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -73,6 +75,17 @@ export default function LandingPage() {
     setActiveSlug(doc.slug);
     setActiveGroup(doc.group ?? null);
     setIsSidebarOpen(false);
+    setExpandedSections(prev => { const next = new Set(prev); next.add(doc.category); return next; });
+  };
+
+  const toggleSection = (sectionId: string) => {
+    setExpandedSections(prev => {
+      const next = new Set(prev);
+      if (next.has(sectionId)) next.delete(sectionId);
+      else next.add(sectionId);
+      return next;
+    });
+    selectSection(sectionId);
   };
 
   const filteredDocs = useMemo(() => {
@@ -181,17 +194,18 @@ export default function LandingPage() {
         {librarySections.map((section) => {
           const items = componentDocs?.filter((d) => d.category === section.id) || [];
           if (items.length === 0) return null;
-          const sectionActive = activeCategory === section.id && !activeSlug;
+          const isExpanded = expandedSections.has(section.id);
+          const sectionActive = activeCategory === section.id;
 
           if (isCollapsed) {
             return (
               <div key={section.id} className="flex justify-center">
                 <button
                   title={section.label}
-                  onClick={() => selectSection(section.id)}
+                  onClick={() => toggleSection(section.id)}
                   className={cn(
                     'w-10 h-10 flex items-center justify-center transition-colors border border-[var(--border)]',
-                    activeCategory === section.id
+                    sectionActive
                       ? 'bg-[rgba(255,176,32,0.12)] border-[rgba(255,176,32,0.4)] text-[var(--accent)]'
                       : 'text-[var(--text-3)] hover:text-[var(--text)] hover:bg-[var(--surface-2)]'
                   )}
@@ -202,123 +216,121 @@ export default function LandingPage() {
             );
           }
 
+          const ungrouped = items.filter((d) => !d.group);
+          const groups = new Map<string, { label: string; docs: ComponentDoc[] }>();
+          for (const doc of items) {
+            if (!doc.group) continue;
+            const existing = groups.get(doc.group);
+            if (existing) existing.docs.push(doc);
+            else groups.set(doc.group, { label: doc.groupLabel || doc.group, docs: [doc] });
+          }
+
           return (
             <div key={section.id}>
+              {/* Section header — click to expand + filter */}
               <button
                 type="button"
-                onClick={() => selectSection(section.id)}
-                className="w-full flex items-center gap-3 mb-2 px-1 group text-left"
-                title={section.description}
+                onClick={() => toggleSection(section.id)}
+                className={cn(
+                  'w-full flex items-center gap-2 px-2.5 py-2 transition-colors group text-left',
+                  sectionActive
+                    ? 'text-[var(--accent)] hover:bg-[rgba(255,176,32,0.06)]'
+                    : 'text-[var(--text-2)] hover:bg-[var(--surface-2)]'
+                )}
               >
-                <h2
-                  className={cn(
-                    'text-[10px] tracking-[0.22em] uppercase font-sans font-semibold',
-                    sectionActive ? 'text-[var(--accent)]' : 'text-[var(--text-3)] group-hover:text-[var(--text-2)]'
-                  )}
-                >
+                <span className={cn(
+                  'font-pixel text-[9px] leading-none shrink-0',
+                  isExpanded ? 'text-[var(--accent)]' : 'text-[var(--text-3)]'
+                )}>
+                  {isExpanded ? '▾' : '▸'}
+                </span>
+                <span className={cn(
+                  'font-pixel text-[11px] flex-1 tracking-widest',
+                  sectionActive ? 'text-[var(--accent)]' : 'group-hover:text-[var(--text)]'
+                )}>
                   {section.label}
-                </h2>
-                <div
-                  className="flex-1 h-[1px]"
-                  style={{
-                    background:
-                      'repeating-linear-gradient(to right, var(--border) 0 3px, transparent 3px 6px)',
-                  }}
-                />
-                <span className="font-mono text-[9px] text-[var(--text-3)]">{getCategoryCount(section.id)}</span>
+                </span>
+                <span className={cn(
+                  'font-mono text-[9px] shrink-0',
+                  sectionActive ? 'text-[var(--accent)]' : 'text-[var(--text-3)]'
+                )}>
+                  {items.length}
+                </span>
               </button>
-              <ul className="space-y-0.5">
-                {(() => {
-                  const ungrouped = items.filter((d) => !d.group);
-                  const groups = new Map<string, { label: string; docs: ComponentDoc[] }>();
-                  for (const doc of items) {
-                    if (!doc.group) continue;
-                    const existing = groups.get(doc.group);
-                    if (existing) existing.docs.push(doc);
-                    else groups.set(doc.group, { label: doc.groupLabel || doc.group, docs: [doc] });
-                  }
 
-                  return (
-                    <>
-                      {ungrouped.map((doc) => {
-                        const itemActive = activeSlug === doc.slug;
-                        return (
-                          <li key={doc.slug}>
-                            <button
-                              type="button"
-                              onClick={() => selectItem(doc)}
-                              className={cn(
-                                'w-full flex items-center justify-between px-2.5 py-1.5 transition-colors group',
-                                itemActive
-                                  ? 'bg-[rgba(255,176,32,0.12)] text-[var(--accent)]'
-                                  : 'text-[var(--text-2)] hover:bg-[var(--surface-2)]'
-                              )}
-                            >
-                              <span className="flex items-center gap-2 min-w-0">
-                                <span className={cn('text-[9px]', itemActive ? 'text-[var(--accent)]' : 'text-[var(--text-3)]')}>▸</span>
-                                <span
+              {/* Expanded item list */}
+              {isExpanded && (
+                <ul className="mb-1 ml-3 border-l border-[var(--border)] pl-1.5 space-y-0.5">
+                  {ungrouped.map((doc) => {
+                    const itemActive = activeSlug === doc.slug;
+                    return (
+                      <li key={doc.slug}>
+                        <button
+                          type="button"
+                          onClick={() => selectItem(doc)}
+                          className={cn(
+                            'w-full flex items-center gap-2 px-2 py-1.5 transition-colors text-left',
+                            itemActive
+                              ? 'bg-[rgba(255,176,32,0.12)] text-[var(--accent)]'
+                              : 'text-[var(--text-3)] hover:text-[var(--text)] hover:bg-[var(--surface-2)]'
+                          )}
+                        >
+                          <span className="text-[8px] leading-none shrink-0">·</span>
+                          <span className={cn('font-pixel text-[11px] truncate', itemActive ? 'text-[var(--accent)]' : '')}>
+                            {doc.name}
+                          </span>
+                        </button>
+                      </li>
+                    );
+                  })}
+
+                  {[...groups.entries()].map(([groupId, group]) => {
+                    const groupSelected = activeGroup === groupId && !activeSlug;
+                    return (
+                      <li key={groupId} className="mt-1">
+                        <button
+                          type="button"
+                          onClick={() => selectGroup(groupId, section.id)}
+                          className={cn(
+                            'w-full flex items-center justify-between px-2 py-1.5 transition-colors',
+                            groupSelected
+                              ? 'bg-[rgba(255,176,32,0.12)] text-[var(--accent)]'
+                              : 'text-[var(--text-2)] hover:bg-[var(--surface-2)]'
+                          )}
+                        >
+                          <span className="flex items-center gap-1.5">
+                            <span className="text-[8px]">▾</span>
+                            <span className="font-pixel text-[11px]">{group.label}</span>
+                          </span>
+                          <span className="font-mono text-[9px] text-[var(--text-3)]">{group.docs.length}</span>
+                        </button>
+                        <ul className="mt-0.5 ml-2 border-l border-[var(--border)] pl-1 space-y-0.5">
+                          {group.docs.map((doc) => {
+                            const itemActive = activeSlug === doc.slug;
+                            return (
+                              <li key={doc.slug}>
+                                <button
+                                  type="button"
+                                  onClick={() => selectItem(doc)}
                                   className={cn(
-                                    'font-pixel text-[12px] truncate',
-                                    itemActive ? 'text-[var(--accent)]' : 'text-[var(--text-2)] group-hover:text-[var(--text)]'
+                                    'w-full flex items-center gap-2 px-2 py-1.5 transition-colors text-left',
+                                    itemActive
+                                      ? 'bg-[rgba(255,176,32,0.12)] text-[var(--accent)]'
+                                      : 'text-[var(--text-3)] hover:text-[var(--text)] hover:bg-[var(--surface-2)]'
                                   )}
                                 >
-                                  {doc.name}
-                                </span>
-                              </span>
-                            </button>
-                          </li>
-                        );
-                      })}
-
-                      {[...groups.entries()].map(([groupId, group]) => {
-                        const groupSelected = activeGroup === groupId && !activeSlug;
-                        return (
-                          <li key={groupId} className="mt-1">
-                            <button
-                              type="button"
-                              onClick={() => selectGroup(groupId, section.id)}
-                              className={cn(
-                                'w-full flex items-center justify-between px-2.5 py-1.5 transition-colors',
-                                groupSelected || activeGroup === groupId
-                                  ? 'bg-[rgba(255,176,32,0.12)] text-[var(--accent)]'
-                                  : 'text-[var(--text-2)] hover:bg-[var(--surface-2)]'
-                              )}
-                            >
-                              <span className="flex items-center gap-2">
-                                <span className="text-[9px]">▾</span>
-                                <span className="font-pixel text-[12px]">{group.label}</span>
-                              </span>
-                              <span className="font-mono text-[9px] text-[var(--text-3)]">{group.docs.length}</span>
-                            </button>
-                            <ul className="mt-0.5 ml-2 border-l border-[var(--border)] pl-1 space-y-0.5">
-                              {group.docs.map((doc) => {
-                                const itemActive = activeSlug === doc.slug;
-                                return (
-                                  <li key={doc.slug}>
-                                    <button
-                                      type="button"
-                                      onClick={() => selectItem(doc)}
-                                      className={cn(
-                                        'w-full flex items-center gap-2 px-2 py-1.5 transition-colors text-left',
-                                        itemActive
-                                          ? 'bg-[rgba(255,176,32,0.12)] text-[var(--accent)]'
-                                          : 'text-[var(--text-3)] hover:text-[var(--text)] hover:bg-[var(--surface-2)]'
-                                      )}
-                                    >
-                                      <span className="text-[8px]">▸</span>
-                                      <span className="font-pixel text-[11px] truncate">{doc.name}</span>
-                                    </button>
-                                  </li>
-                                );
-                              })}
-                            </ul>
-                          </li>
-                        );
-                      })}
-                    </>
-                  );
-                })()}
-              </ul>
+                                  <span className="text-[8px] shrink-0">·</span>
+                                  <span className="font-pixel text-[11px] truncate">{doc.name}</span>
+                                </button>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
             </div>
           );
         })}
@@ -431,6 +443,108 @@ export default function LandingPage() {
         return (
           <div className="w-full max-w-[200px]">
             <PixelInput label="PLAYER" placeholder="enter name..." />
+          </div>
+        );
+      case 'HeroDotMorph':
+        // Negative inset bleeds through the p-6 padding of the preview stage
+        return (
+          <div style={{ position: 'absolute', inset: -24 }}>
+            <HeroDotMorph />
+          </div>
+        );
+      case 'HeroDotSection':
+        return (
+          <div style={{ position: 'absolute', inset: -24, backgroundColor: '#FAF8F5', overflow: 'hidden' }}>
+            {/* Mini navbar */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 14px', borderBottom: '1px solid #E8E2DA' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                <div style={{ width: 10, height: 10, backgroundColor: '#C8102E' }} />
+                <span style={{ fontSize: 8, fontWeight: 800, color: '#18120F', letterSpacing: '-0.02em' }}>RetroChunk</span>
+              </div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                {['Features', 'Docs', 'Pricing'].map(l => (
+                  <span key={l} style={{ fontSize: 7, color: '#9E9089' }}>{l}</span>
+                ))}
+              </div>
+              <div style={{ backgroundColor: '#C8102E', padding: '2px 6px' }}>
+                <span style={{ fontSize: 7, color: '#fff', fontWeight: 600 }}>Get started</span>
+              </div>
+            </div>
+            {/* Mini hero body */}
+            <div style={{ display: 'flex', height: 'calc(100% - 27px)', position: 'relative' }}>
+              {/* Left text */}
+              <div style={{ width: '54%', padding: '14px 14px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 6, zIndex: 2 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <div style={{ width: 5, height: 5, borderRadius: '50%', backgroundColor: '#C8102E' }} />
+                  <span style={{ fontSize: 6, color: '#9E9089', fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Now in open beta</span>
+                </div>
+                <div style={{ fontSize: 16, fontWeight: 900, color: '#18120F', lineHeight: 1.0, letterSpacing: '-0.03em' }}>
+                  UI that<br />feels <span style={{ color: '#C8102E' }}>alive.</span>
+                </div>
+                <div style={{ fontSize: 7, color: '#7A6F65', lineHeight: 1.5, maxWidth: 90 }}>Canvas-powered React components.</div>
+                <div style={{ display: 'flex', gap: 5, alignItems: 'center', marginTop: 2 }}>
+                  <div style={{ backgroundColor: '#C8102E', padding: '3px 8px' }}>
+                    <span style={{ fontSize: 7, color: '#fff', fontWeight: 600 }}>Start free</span>
+                  </div>
+                  <span style={{ fontSize: 7, color: '#9E9089' }}>See all →</span>
+                </div>
+              </div>
+              {/* Right: animation */}
+              <div style={{ position: 'absolute', right: 0, top: 0, width: '50%', height: '100%' }}>
+                <div style={{ position: 'absolute', inset: '-6%' }}>
+                  <HeroDotMorph />
+                </div>
+              </div>
+              {/* Gradient blend */}
+              <div style={{ position: 'absolute', top: 0, height: '100%', left: '44%', width: '14%', background: 'linear-gradient(to right, #FAF8F5, transparent)', zIndex: 3, pointerEvents: 'none' }} />
+            </div>
+          </div>
+        );
+      case 'HeroPixel':
+        return (
+          <div className="flex flex-col items-start justify-center gap-3 w-full h-full px-2">
+            <div className="font-pixel text-[9px] text-[var(--text-3)] uppercase tracking-widest">Hero Block</div>
+            <div className="font-pixel text-[15px] leading-snug text-[var(--text)]">Build<br />Retro UIs</div>
+            <div className="font-sans text-[10px] text-[var(--text-2)]">Pixel-art hero with mascot + CTAs.</div>
+            <div className="flex gap-2 mt-1">
+              <div className="px-2 py-1 text-[9px] font-pixel bg-[var(--accent)] text-[var(--accent-ink)] border-2 border-[var(--accent-ink)] shadow-[2px_2px_0_var(--accent-ink)]">GET STARTED</div>
+              <div className="px-2 py-1 text-[9px] font-pixel border-2 border-[var(--border)] text-[var(--text-2)]">GITHUB</div>
+            </div>
+          </div>
+        );
+      case 'TestimonialsPixel':
+        return (
+          <div className="flex flex-col gap-2 w-full h-full justify-center px-1">
+            {[
+              { name: 'ALEX.JS', role: 'Frontend Dev', text: 'This UI library brings nostalgic joy!' },
+              { name: 'PIXEL.DEV', role: 'Game Dev', text: 'Components are super easy to use.' },
+            ].map((t) => (
+              <div key={t.name} className="border border-[var(--border)] bg-[var(--surface-2)] p-2">
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="w-4 h-4 bg-[var(--accent)] shrink-0" />
+                  <div>
+                    <div className="font-pixel text-[8px] text-[var(--accent)]">{t.name}</div>
+                    <div className="font-mono text-[7px] text-[var(--text-3)]">{t.role}</div>
+                  </div>
+                </div>
+                <p className="font-sans text-[9px] text-[var(--text-2)] leading-tight">{t.text}</p>
+              </div>
+            ))}
+          </div>
+        );
+      case 'DashboardPixel':
+        return (
+          <div className="flex flex-col gap-2 w-full h-full justify-center">
+            <div className="font-pixel text-[9px] text-[var(--accent)] mb-1">ADMIN_PANEL</div>
+            <div className="grid grid-cols-2 gap-1.5">
+              {[{ label: 'USERS', val: '1,337', up: true }, { label: 'REVENUE', val: '9,001', up: true }, { label: 'ERRORS', val: '404', up: false }, { label: 'SESSIONS', val: '8,192', up: true }].map(s => (
+                <div key={s.label} className="border border-[var(--border)] bg-[var(--surface-2)] px-2 py-1.5">
+                  <div className="font-pixel text-[7px] text-[var(--text-3)] mb-0.5">{s.label}</div>
+                  <div className="font-pixel text-[11px] text-[var(--text)]">{s.val}</div>
+                  <div className={`font-mono text-[7px] ${s.up ? 'text-[var(--success)]' : 'text-[var(--danger,#ef4444)]'}`}>{s.up ? '+' : ''}12%</div>
+                </div>
+              ))}
+            </div>
           </div>
         );
       case 'Bit':

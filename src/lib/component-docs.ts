@@ -2,7 +2,7 @@ export interface ComponentDoc {
   slug: string;
   name: string;
   description: string;
-  category: "primitive" | "mascot" | "block" | "loader";
+  category: "primitive" | "mascot" | "block" | "loader" | "hero";
   /** Optional nest under a personality pack in the sidebar (e.g. "volt") */
   group?: string;
   groupLabel?: string;
@@ -221,7 +221,7 @@ const palette = [
     name: "HeroPixel",
     description:
       "A hero section block with pixel-font headline, body copy, CTA buttons, and a live mascot.",
-    category: "block",
+    category: "hero",
     props: [
       { name: "title", type: "string", description: "Hero headline text." },
       { name: "subtitle", type: "string", description: "Body copy under the headline." },
@@ -241,6 +241,68 @@ const palette = [
   secondaryText="View on GitHub"
   secondaryHref="https://github.com"
 />`,
+  },
+  {
+    slug: "hero-dot-section",
+    name: "HeroDotSection",
+    description:
+      "Full-screen hero section — large headline and CTAs on the left, with the HeroDotMorph canvas animation bleeding off the right and top edges. Unified cream background with a soft gradient fade between text and animation.",
+    category: "hero",
+    props: [
+      { name: "badge", type: "string", default: "'Now available · V1.0'", description: "Small badge label above the headline." },
+      { name: "headline", type: "string", description: "Main headline (use \\n for line breaks)." },
+      { name: "accent", type: "string", description: "Accent line shown below headline in brand red." },
+      { name: "subheadline", type: "string", description: "Supporting copy beneath the headline." },
+      { name: "ctaPrimary", type: "{ text: string; href: string }", description: "Primary CTA button." },
+      { name: "ctaSecondary", type: "{ text: string; href: string }", description: "Secondary ghost CTA." },
+      { name: "stats", type: "{ value: string; label: string }[]", description: "Stat numbers shown at the bottom." },
+      { name: "className", type: "string", description: "Additional CSS classes on the section wrapper." },
+    ],
+    code: `import { HeroDotSection } from "@/components/blocks";
+
+<HeroDotSection
+  badge="Now available · V1.0"
+  headline={"Build products\\nthat feel"}
+  accent="alive."
+  subheadline="Premium animated React components, drop-in ready."
+  ctaPrimary={{ text: 'Get Started', href: '/docs' }}
+  ctaSecondary={{ text: 'Browse Components', href: '/' }}
+  stats={[
+    { value: '32', label: 'Components' },
+    { value: '4', label: 'Categories' },
+    { value: '0', label: 'Dependencies' },
+  ]}
+/>`,
+  },
+  {
+    slug: "hero-dot-morph",
+    name: "HeroDotMorph",
+    description:
+      "Premium hero block with a canvas-rendered mass of deep-red dots that breathes between a filled circle and an organic multi-rayed starburst in a seamless loop.",
+    category: "hero",
+    props: [
+      { name: "className", type: "string", description: "Additional CSS classes on the wrapper." },
+    ],
+    code: `import { HeroDotMorph } from "@/components/blocks";
+
+// Pure animation — compose your own text/CTA on top
+<div className="relative h-screen">
+  <HeroDotMorph className="absolute inset-0" />
+
+  {/* your hero copy goes here */}
+  <div className="relative z-10 flex flex-col justify-center h-full pl-20 max-w-lg">
+    <h1 className="text-6xl font-bold text-gray-900 leading-tight mb-4">
+      The tool that<br />
+      <span style={{ color: "#C8102E" }}>thinks ahead.</span>
+    </h1>
+    <p className="text-gray-500 text-lg mb-8">
+      Beautifully minimal. Quietly powerful.
+    </p>
+    <button className="self-start px-8 py-3 bg-[#C8102E] text-white font-semibold">
+      Get early access
+    </button>
+  </div>
+</div>`,
   },
   {
     slug: "testimonials-pixel",

@@ -1,6 +1,6 @@
 import type { ComponentDoc } from './component-docs';
 
-export type LibrarySectionId = 'primitive' | 'mascot' | 'loader' | 'block';
+export type LibrarySectionId = 'primitive' | 'mascot' | 'loader' | 'hero' | 'block';
 
 export interface LibrarySection {
   id: LibrarySectionId;
@@ -30,9 +30,15 @@ export const librarySections: LibrarySection[] = [
     icon: '◈',
   },
   {
+    id: 'hero',
+    label: 'HERO',
+    description: 'Full-screen hero sections with canvas animations',
+    icon: '◉',
+  },
+  {
     id: 'block',
     label: 'BLOCKS',
-    description: 'Heroes, dashboards, testimonials, and sections',
+    description: 'Dashboards, testimonials, and sections',
     icon: '▦',
   },
 ];
