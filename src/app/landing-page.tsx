@@ -4,7 +4,7 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { componentDocs, type ComponentDoc } from '@/lib/component-docs';
 import { librarySections } from '@/lib/library-sections';
-import { PixelButton, PixelCard, PixelBadge, PixelWindow, PixelInput, PixelLoader, PixelDotsLoader, PixelBarLoader, PixelOrbitLoader, PixelStackLoader, PixelScanLoader, PixelSnakeLoader, PixelHourglassLoader, PixelGlitchLoader, PixelRingLoader, PixelEqualizerLoader, PixelPulseLoader } from '@/components/ui';
+import { PixelButton, PixelCard, PixelBadge, PixelWindow, PixelInput, PixelToggle, PixelCheckbox, PixelRadioGroup, PixelSelect, PixelLoader, PixelDotsLoader, PixelBarLoader, PixelOrbitLoader, PixelStackLoader, PixelScanLoader, PixelSnakeLoader, PixelHourglassLoader, PixelGlitchLoader, PixelRingLoader, PixelEqualizerLoader, PixelPulseLoader, PixelDropLoader, PixelHelixLoader } from '@/components/ui';
 import { HeroDotMorph, HeroDotSection, HeroPixel, TestimonialsPixel, DashboardPixel } from '@/components/blocks';
 import {
   Mascot,
@@ -445,6 +445,51 @@ export default function LandingPage() {
             <PixelInput label="PLAYER" placeholder="enter name..." />
           </div>
         );
+      case 'PixelToggle':
+        // Uncontrolled so the cards stay interactive without hooks in here
+        return (
+          <div className="flex flex-col items-start justify-center gap-3.5 p-4">
+            <PixelToggle size="sm" label="SCANLINES" defaultChecked />
+            <PixelToggle size="md" label="SOUND FX" />
+            <PixelToggle size="lg" label="CRT MODE" defaultChecked />
+          </div>
+        );
+      case 'PixelCheckbox':
+        return (
+          <div className="flex flex-col items-start justify-center gap-3 p-4">
+            <PixelCheckbox label="SCANLINES" defaultChecked />
+            <PixelCheckbox label="SOUND FX" />
+            <PixelCheckbox label="LOCKED" disabled />
+          </div>
+        );
+      case 'PixelRadioGroup':
+        return (
+          <div className="w-full max-w-[200px] px-4">
+            <PixelRadioGroup
+              label="DIFFICULTY"
+              defaultValue="normal"
+              options={[
+                { value: 'easy', label: 'EASY' },
+                { value: 'normal', label: 'NORMAL' },
+                { value: 'hard', label: 'HARD' },
+              ]}
+            />
+          </div>
+        );
+      case 'PixelSelect':
+        return (
+          <div className="w-full max-w-[210px]">
+            <PixelSelect
+              label="REGION"
+              defaultValue="eu"
+              options={[
+                { value: 'na', label: 'North America' },
+                { value: 'eu', label: 'Europe' },
+                { value: 'jp', label: 'Japan' },
+              ]}
+            />
+          </div>
+        );
       case 'HeroDotMorph':
         // Negative inset bleeds through the p-6 padding of the preview stage
         return (
@@ -569,6 +614,8 @@ export default function LandingPage() {
             ring: <PixelRingLoader size="md" />,
             equalizer: <PixelEqualizerLoader size="md" />,
             pulse: <PixelPulseLoader size="md" />,
+            drop: <PixelDropLoader size="md" />,
+            helix: <PixelHelixLoader size="md" />,
           } as const;
           const node = loaders[doc.loader as keyof typeof loaders] ?? <PixelLoader />;
           return (

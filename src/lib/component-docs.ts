@@ -144,6 +144,188 @@ export const componentDocs: ComponentDoc[] = [
 <PixelInput label="CODE" error="Invalid invite code." />`,
   },
   {
+    slug: "pixel-toggle",
+    name: "PixelToggle",
+    description:
+      "A chunky switch whose knob steps across the track instead of sliding. Works controlled or uncontrolled, with an optional pixel-font label.",
+    category: "primitive",
+    props: [
+      {
+        name: "checked",
+        type: "boolean",
+        description: "Controlled state. Omit to let the toggle manage its own.",
+      },
+      {
+        name: "defaultChecked",
+        type: "boolean",
+        default: "false",
+        description: "Initial state when uncontrolled.",
+      },
+      {
+        name: "onCheckedChange",
+        type: "(checked: boolean) => void",
+        description: "Called with the next state whenever the toggle flips.",
+      },
+      { name: "size", type: "'sm' | 'md' | 'lg'", default: "'md'", description: "Toggle scale." },
+      {
+        name: "label",
+        type: "string",
+        description: "Optional pixel-font label beside the track. Doubles as the accessible name.",
+      },
+      { name: "disabled", type: "boolean", default: "false", description: "Disables the toggle." },
+      { name: "className", type: "string", description: "Additional CSS classes." },
+    ],
+    code: `import { useState } from "react";
+import { PixelToggle } from "@/components/ui";
+
+// Uncontrolled
+<PixelToggle label="SOUND FX" defaultChecked />
+
+// Controlled
+const [crt, setCrt] = useState(true);
+
+<PixelToggle label="CRT FILTER" checked={crt} onCheckedChange={setCrt} />
+
+// Sizes — always pass a label or aria-label
+<PixelToggle size="sm" aria-label="Scanlines" />
+<PixelToggle size="md" aria-label="Scanlines" />
+<PixelToggle size="lg" aria-label="Scanlines" />`,
+  },
+  {
+    slug: "pixel-checkbox",
+    name: "PixelCheckbox",
+    description:
+      "A checkbox with a hand-plotted pixel checkmark. Wraps a native input, so form submission and Space-to-toggle come for free.",
+    category: "primitive",
+    props: [
+      { name: "label", type: "string", description: "Pixel-font label beside the box." },
+      { name: "hint", type: "string", description: "Helper text under the control." },
+      { name: "error", type: "string", description: "Error message; switches border to danger." },
+      { name: "size", type: "'sm' | 'md' | 'lg'", default: "'md'", description: "Box scale." },
+      { name: "checked", type: "boolean", description: "Controlled state. Pair with onChange." },
+      {
+        name: "defaultChecked",
+        type: "boolean",
+        description: "Initial state when uncontrolled.",
+      },
+      { name: "disabled", type: "boolean", default: "false", description: "Disables the checkbox." },
+      { name: "className", type: "string", description: "Additional CSS classes on the wrapper." },
+    ],
+    code: `import { PixelCheckbox } from "@/components/ui";
+
+<PixelCheckbox label="SCANLINES" defaultChecked />
+<PixelCheckbox label="NEWSLETTER" hint="One email a month, tops." />
+<PixelCheckbox label="ACCEPT TERMS" error="You must accept to continue." />
+<PixelCheckbox label="LOCKED" disabled />
+
+// Sizes
+<PixelCheckbox size="sm" label="SM" />
+<PixelCheckbox size="lg" label="LG" />`,
+  },
+  {
+    slug: "pixel-radio-group",
+    name: "PixelRadioGroup",
+    description:
+      "A radio group built from native inputs — arrow-key navigation works out of the box. Selection shows as a square inside a square, never a round dot.",
+    category: "primitive",
+    props: [
+      {
+        name: "options",
+        type: "{ value, label, disabled? }[]",
+        description: "The choices to render.",
+      },
+      { name: "value", type: "string", description: "Controlled selection. Pair with onValueChange." },
+      { name: "defaultValue", type: "string", description: "Initial selection when uncontrolled." },
+      {
+        name: "onValueChange",
+        type: "(value: string) => void",
+        description: "Called with the newly selected value.",
+      },
+      { name: "name", type: "string", description: "Shared input name. Auto-generated when omitted." },
+      { name: "label", type: "string", description: "Group label." },
+      { name: "hint", type: "string", description: "Helper text under the group." },
+      { name: "error", type: "string", description: "Error message; switches borders to danger." },
+      { name: "size", type: "'sm' | 'md' | 'lg'", default: "'md'", description: "Control scale." },
+      {
+        name: "orientation",
+        type: "'vertical' | 'horizontal'",
+        default: "'vertical'",
+        description: "Stacking direction.",
+      },
+      { name: "disabled", type: "boolean", default: "false", description: "Disables every option." },
+    ],
+    code: `import { useState } from "react";
+import { PixelRadioGroup } from "@/components/ui";
+
+const DIFFICULTY = [
+  { value: "easy", label: "EASY" },
+  { value: "normal", label: "NORMAL" },
+  { value: "hard", label: "HARD" },
+  { value: "nightmare", label: "NIGHTMARE", disabled: true },
+];
+
+// Uncontrolled
+<PixelRadioGroup label="DIFFICULTY" options={DIFFICULTY} defaultValue="normal" />
+
+// Controlled
+const [mode, setMode] = useState("normal");
+
+<PixelRadioGroup
+  label="DIFFICULTY"
+  options={DIFFICULTY}
+  value={mode}
+  onValueChange={setMode}
+  hint="Nightmare unlocks after one clear."
+/>
+
+// Horizontal
+<PixelRadioGroup options={DIFFICULTY} orientation="horizontal" defaultValue="easy" />`,
+  },
+  {
+    slug: "pixel-select",
+    name: "PixelSelect",
+    description:
+      "A styled native select with a stepped pixel caret. Keeps native keyboard behaviour and the mobile picker, unlike a custom dropdown.",
+    category: "primitive",
+    props: [
+      {
+        name: "options",
+        type: "{ value, label, disabled? }[]",
+        description: "The options to render.",
+      },
+      { name: "label", type: "string", description: "Optional field label." },
+      { name: "hint", type: "string", description: "Helper text under the field." },
+      { name: "error", type: "string", description: "Error message; switches border to danger." },
+      {
+        name: "placeholder",
+        type: "string",
+        description: 'Disabled first option; pair with defaultValue="".',
+      },
+      { name: "size", type: "'sm' | 'md' | 'lg'", default: "'md'", description: "Field height." },
+      { name: "disabled", type: "boolean", default: "false", description: "Disables the select." },
+      { name: "className", type: "string", description: "Additional CSS classes on the select." },
+    ],
+    code: `import { PixelSelect } from "@/components/ui";
+
+const REGIONS = [
+  { value: "na", label: "North America" },
+  { value: "eu", label: "Europe" },
+  { value: "jp", label: "Japan" },
+];
+
+<PixelSelect label="REGION" options={REGIONS} defaultValue="eu" />
+
+<PixelSelect
+  label="REGION"
+  options={REGIONS}
+  placeholder="Choose a region..."
+  defaultValue=""
+  hint="Sets your matchmaking pool."
+/>
+
+<PixelSelect label="REGION" options={REGIONS} error="Region is required." />`,
+  },
+  {
     slug: "pixel-creature",
     name: "PixelCreature",
     description:

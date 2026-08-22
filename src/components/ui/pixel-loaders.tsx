@@ -622,3 +622,240 @@ export const PixelPulseLoader = React.forwardRef<HTMLDivElement, PixelLoaderBase
   }
 );
 PixelPulseLoader.displayName = 'PixelPulseLoader';
+
+/** Tetromino drops into the well, completes the bottom row, and the line clears */
+export const PixelDropLoader = React.forwardRef<HTMLDivElement, PixelLoaderBaseProps>(
+  ({ className, size = 'md', ...props }, ref) => {
+    const cell = size === 'sm' ? 4 : size === 'md' ? 6 : 8;
+    const gap = 1;
+    const step = cell + gap;
+    const cols = 6;
+    const rows = 7;
+    const cycle = 2.6;
+
+    // Bottom row is pre-filled except for a 2-wide notch the falling piece completes
+    const stackCols = [0, 1, 2, 3];
+    const pieceCols = [4, 5];
+    const pieceTopRow = rows - 2;
+    // Starts one row above the well so it only spends a single step out of sight
+    const dropSteps = pieceTopRow + 1;
+    const travel = dropSteps * step;
+
+    // Jagged leftover stack so the well reads as a game already in progress. Kept
+    // to cols 0-3 to leave the piece a clear runway, and every row has a hole so
+    // none of them is a completed line that ought to clear too.
+    const rubble: [number, number][] = [
+      [0, rows - 2], [1, rows - 2], [3, rows - 2],
+      [0, rows - 3], [3, rows - 3],
+      [0, rows - 4],
+    ];
+
+    const innerW = cols * step - gap;
+    const innerH = rows * step - gap;
+    const pad = size === 'sm' ? 8 : size === 'md' ? 10 : 12;
+
+    const block = 'bg-[var(--accent)] border border-[var(--accent-ink)]';
+
+    return (
+      <div
+        ref={ref}
+        role="status"
+        aria-label="Loading"
+        className={cn('relative flex items-center justify-center', loaderShell, className)}
+        style={{
+          width: innerW + pad * 2,
+          height: innerH + pad * 2,
+          ['--drop-travel' as string]: `-${travel}px`,
+          ['--drop-row' as string]: `${step}px`,
+        }}
+        {...props}
+      >
+        {/* Clipped to the well so the piece enters from off-playfield */}
+        <div className="relative overflow-hidden" style={{ width: innerW, height: innerH }}>
+          {Array.from({ length: cols * rows }).map((_, i) => (
+            <div
+              key={`well-${i}`}
+              className="absolute bg-[var(--surface-2)]"
+              style={{
+                width: cell,
+                height: cell,
+                left: (i % cols) * step,
+                top: Math.floor(i / cols) * step,
+                opacity: 0.5,
+              }}
+            />
+          ))}
+
+          {/* Hard-drop ghost — shows the landing slot until the piece covers it */}
+          {pieceCols.map((c) => (
+            <React.Fragment key={`ghost-${c}`}>
+              {[pieceTopRow, rows - 1].map((r) => (
+                <div
+                  key={r}
+                  className="absolute"
+                  style={{
+                    width: cell,
+                    height: cell,
+                    left: c * step,
+                    top: r * step,
+                    border: '1px solid color-mix(in srgb, var(--accent) 30%, transparent)',
+                  }}
+                />
+              ))}
+            </React.Fragment>
+          ))}
+
+          {/* Older debris — dimmed by colour, not opacity, so the settle keyframe
+              (which drives opacity to 1) can still ride gravity down a row */}
+          {rubble.map(([c, r]) => (
+            <div
+              key={`rubble-${c}-${r}`}
+              className="absolute border border-[var(--accent-ink)]"
+              style={{
+                width: cell,
+                height: cell,
+                left: c * step,
+                top: r * step,
+                background: 'color-mix(in srgb, var(--cool) 42%, var(--surface-2))',
+                animation: `loader-drop-settle ${cycle}s infinite linear`,
+              }}
+            />
+          ))}
+
+          {/* Locked stack — strobes and clears together with the completed row */}
+          {stackCols.map((c) => (
+            <div
+              key={`stack-${c}`}
+              className={cn('absolute origin-bottom', block)}
+              style={{
+                width: cell,
+                height: cell,
+                left: c * step,
+                top: (rows - 1) * step,
+                animation: `loader-drop-clear ${cycle}s infinite linear`,
+              }}
+            />
+          ))}
+
+          <div
+            className="absolute"
+            style={{
+              left: pieceCols[0] * step,
+              top: pieceTopRow * step,
+              width: 2 * step - gap,
+              height: 2 * step - gap,
+              animation: `loader-drop-fall ${cycle}s infinite steps(${dropSteps}, end)`,
+            }}
+          >
+            {pieceCols.map((c, ci) => (
+              <React.Fragment key={c}>
+                {/* Upper half survives the clear, then falls one row */}
+                <div
+                  className={cn('absolute', block)}
+                  style={{
+                    width: cell,
+                    height: cell,
+                    left: ci * step,
+                    top: 0,
+                    animation: `loader-drop-settle ${cycle}s infinite linear`,
+                  }}
+                />
+                {/* Lower half fills the notch and goes with the line */}
+                <div
+                  className={cn('absolute origin-bottom', block)}
+                  style={{
+                    width: cell,
+                    height: cell,
+                    left: ci * step,
+                    top: step,
+                    animation: `loader-drop-clear ${cycle}s infinite linear`,
+                  }}
+                />
+              </React.Fragment>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+);
+PixelDropLoader.displayName = 'PixelDropLoader';
+
+/** Two-strand pixel double helix — blocks scale and fade to fake depth */
+export const PixelHelixLoader = React.forwardRef<HTMLDivElement, PixelLoaderBaseProps>(
+  ({ className, size = 'md', ...props }, ref) => {
+    const block = size === 'sm' ? 3 : size === 'md' ? 5 : 7;
+    const pitch = size === 'sm' ? 6 : size === 'md' ? 9 : 12;
+    const amp = size === 'sm' ? 7 : size === 'md' ? 11 : 15;
+    const cols = 9;
+    const cycle = 1.8;
+    const turns = 1.5; // full twists visible across the width
+
+    const innerW = (cols - 1) * pitch + block;
+    const innerH = amp * 2 + block;
+    const pad = size === 'sm' ? 8 : size === 'md' ? 10 : 12;
+    const padX = pad + 2;
+
+    return (
+      <div
+        ref={ref}
+        role="status"
+        aria-label="Loading"
+        className={cn('relative flex items-center justify-center', loaderShell, className)}
+        style={{
+          width: innerW + padX * 2,
+          height: innerH + pad * 2,
+          ['--helix-amp' as string]: `${amp}px`,
+        }}
+        {...props}
+      >
+        <div className="relative" style={{ width: innerW, height: innerH }}>
+          {Array.from({ length: cols }).map((_, i) => {
+            // Each column sits one step further around the twist
+            const phase = -((i * turns) / cols) * cycle;
+            const left = i * pitch;
+            return (
+              <React.Fragment key={i}>
+                <div
+                  className="absolute bg-[var(--text-3)]"
+                  style={{
+                    width: 1,
+                    height: amp * 2,
+                    left: left + block / 2,
+                    top: block / 2,
+                    animation: `loader-helix-rung ${cycle}s infinite ease-in-out`,
+                    animationDelay: `${phase}s`,
+                  }}
+                />
+                <div
+                  className="absolute bg-[var(--accent)]"
+                  style={{
+                    width: block,
+                    height: block,
+                    left,
+                    top: amp,
+                    animation: `loader-helix-strand ${cycle}s infinite ease-in-out`,
+                    animationDelay: `${phase}s`,
+                  }}
+                />
+                {/* Half a turn behind the accent strand — always the opposite side */}
+                <div
+                  className="absolute bg-[var(--cool)]"
+                  style={{
+                    width: block,
+                    height: block,
+                    left,
+                    top: amp,
+                    animation: `loader-helix-strand ${cycle}s infinite ease-in-out`,
+                    animationDelay: `${phase - cycle / 2}s`,
+                  }}
+                />
+              </React.Fragment>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+);
+PixelHelixLoader.displayName = 'PixelHelixLoader';

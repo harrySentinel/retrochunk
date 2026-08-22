@@ -92,6 +92,13 @@ export function HeroDotMorph({ className }: HeroDotMorphProps) {
       const nH  = Math.round(rec.height * dpr);
       if (nW === W && nH === H) return;
       W = nW; H = nH;
+      // A collapsed or not-yet-laid-out canvas measures 0 and createImageData throws on
+      // that. Drop the buffers and let the ResizeObserver call us back with real numbers.
+      if (W <= 0 || H <= 0) {
+        imgData = null;
+        buf32   = null;
+        return;
+      }
       canvas.width  = W;
       canvas.height = H;
       imgData = ctx.createImageData(W, H);

@@ -12,7 +12,9 @@ export type LoaderKind =
   | 'glitch'
   | 'ring'
   | 'equalizer'
-  | 'pulse';
+  | 'pulse'
+  | 'drop'
+  | 'helix';
 
 export interface LoaderPresetMeta {
   kind: LoaderKind;
@@ -106,6 +108,22 @@ export const loaderPresetMeta: LoaderPresetMeta[] = [
     label: 'Pulse',
     description: '9×9 pixel grid — concentric rings flash outward from the center like a radar ping.',
     importName: 'PixelPulseLoader',
+  },
+  {
+    kind: 'drop',
+    name: 'loader_drop',
+    label: 'Drop',
+    description:
+      'A tetromino falls row by row into a half-stacked well, completes the bottom line, and the row strobes and clears — then everything above drops under gravity.',
+    importName: 'PixelDropLoader',
+  },
+  {
+    kind: 'helix',
+    name: 'loader_helix',
+    label: 'Helix',
+    description:
+      'Two-tone double helix — blocks scale and fade as they rotate, with rungs that stretch between the strands.',
+    importName: 'PixelHelixLoader',
   },
 ];
 

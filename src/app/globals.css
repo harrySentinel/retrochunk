@@ -197,6 +197,47 @@
   70% { opacity: 0.15; transform: scale(0.85); }
 }
 
+/* Piece falls one row per step, then holds while the line clears below it */
+@keyframes loader-drop-fall {
+  0% { transform: translateY(var(--drop-travel)); }
+  46%, 100% { transform: translateY(0); }
+}
+
+/* Completed row: holds, strobes accent↔white, then squashes away. Opens on a
+   short fade so the loop seam reads as a fresh round rather than a pop. */
+@keyframes loader-drop-clear {
+  0% { opacity: 0; transform: scaleY(1); background-color: var(--accent); }
+  4%, 54% { opacity: 1; transform: scaleY(1); background-color: var(--accent); }
+  58% { background-color: var(--text); }
+  62% { background-color: var(--accent); }
+  66% { background-color: var(--text); }
+  70% { opacity: 1; transform: scaleY(1); background-color: var(--accent); }
+  80%, 100% { opacity: 0; transform: scaleY(0); }
+}
+
+/* Everything above the cleared line drops one row, then resets behind the fade */
+@keyframes loader-drop-settle {
+  0% { transform: translateY(0); opacity: 0; }
+  4%, 80% { transform: translateY(0); opacity: 1; }
+  90%, 97% { transform: translateY(var(--drop-row)); opacity: 1; }
+  100% { transform: translateY(var(--drop-row)); opacity: 0; }
+}
+
+/* Y = sin(theta), depth = cos(theta): biggest crossing the centre in front,
+   smallest crossing it behind — which is what reads as a rotating helix */
+@keyframes loader-helix-strand {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 1; }
+  25% { transform: translateY(var(--helix-amp)) scale(0.72); opacity: 0.72; }
+  50% { transform: translateY(0) scale(0.42); opacity: 0.32; }
+  75% { transform: translateY(calc(var(--helix-amp) * -1)) scale(0.72); opacity: 0.72; }
+}
+
+/* Rung is longest when the two strands are farthest apart */
+@keyframes loader-helix-rung {
+  0%, 50%, 100% { transform: scaleY(0.08); opacity: 0.08; }
+  25%, 75% { transform: scaleY(1); opacity: 0.42; }
+}
+
 @keyframes marquee-scroll {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }

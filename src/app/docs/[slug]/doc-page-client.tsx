@@ -4,7 +4,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import type { ComponentDoc } from "@/lib/component-docs";
 import { CodeBlock } from "@/components/ui/code-block";
-import { PixelButton, PixelBadge, PixelCard, PixelWindow, PixelLoader, PixelInput, PixelDotsLoader, PixelBarLoader, PixelOrbitLoader, PixelStackLoader, PixelScanLoader, PixelSnakeLoader, PixelHourglassLoader, PixelGlitchLoader, PixelRingLoader, PixelEqualizerLoader, PixelPulseLoader } from "@/components/ui";
+import { PixelButton, PixelBadge, PixelCard, PixelWindow, PixelLoader, PixelInput, PixelToggle, PixelCheckbox, PixelRadioGroup, PixelSelect, PixelDotsLoader, PixelBarLoader, PixelOrbitLoader, PixelStackLoader, PixelScanLoader, PixelSnakeLoader, PixelHourglassLoader, PixelGlitchLoader, PixelRingLoader, PixelEqualizerLoader, PixelPulseLoader, PixelDropLoader, PixelHelixLoader } from "@/components/ui";
 import { HeroDotMorph, HeroDotSection, HeroPixel, TestimonialsPixel, DashboardPixel } from "@/components/blocks";
 import { Mascot, PixelCreature, PixelPersonality, MASCOT_PALETTE, MASCOT_BASE, MASCOT_FRAMES, type PersonalityMood } from "@/components/mascot";
 
@@ -32,6 +32,8 @@ const LOADER_PREVIEW: Record<string, ReactNode> = {
   ring: <PixelRingLoader size="lg" />,
   equalizer: <PixelEqualizerLoader size="lg" />,
   pulse: <PixelPulseLoader size="lg" />,
+  drop: <PixelDropLoader size="lg" />,
+  helix: <PixelHelixLoader size="lg" />,
 };
 
 function ComponentPreview({ slug, mood, personality, loader }: { slug: string; mood?: string; personality?: string; loader?: string }) {
@@ -175,6 +177,104 @@ function ComponentPreview({ slug, mood, personality, loader }: { slug: string; m
           <PixelInput label="PLAYER" placeholder="enter name..." />
           <PixelInput label="EMAIL" hint="We never share this." defaultValue="you@arcade.dev" />
           <PixelInput label="CODE" error="Invalid invite code." defaultValue="XXXX" />
+        </div>
+      );
+    case "pixel-toggle":
+      return (
+        <div className="flex flex-col gap-8">
+          <div className="flex gap-8 items-end">
+            {(["sm", "md", "lg"] as const).map((sz) => (
+              <div key={sz} className="text-center">
+                <PixelToggle size={sz} defaultChecked aria-label={`${sz} toggle`} />
+                <p className="mt-3 text-xs uppercase" style={{ fontFamily: "var(--font-pixel)", color: "var(--text-3)" }}>
+                  {sz}
+                </p>
+              </div>
+            ))}
+          </div>
+          <div className="flex flex-col gap-4 items-start">
+            <PixelToggle label="SOUND FX" defaultChecked />
+            <PixelToggle label="SCANLINES" />
+            <PixelToggle label="LOCKED" disabled />
+          </div>
+        </div>
+      );
+    case "pixel-checkbox":
+      return (
+        <div className="flex flex-col gap-8">
+          <div className="flex gap-8 items-end">
+            {(["sm", "md", "lg"] as const).map((sz) => (
+              <div key={sz} className="text-center">
+                <PixelCheckbox size={sz} defaultChecked aria-label={`${sz} checkbox`} className="w-auto" />
+                <p className="mt-3 text-xs uppercase" style={{ fontFamily: "var(--font-pixel)", color: "var(--text-3)" }}>
+                  {sz}
+                </p>
+              </div>
+            ))}
+          </div>
+          <div className="flex flex-col gap-4 items-start max-w-sm w-full">
+            <PixelCheckbox label="SCANLINES" defaultChecked />
+            <PixelCheckbox label="NEWSLETTER" hint="One email a month, tops." />
+            <PixelCheckbox label="ACCEPT TERMS" error="You must accept to continue." />
+            <PixelCheckbox label="LOCKED" disabled />
+          </div>
+        </div>
+      );
+    case "pixel-radio-group":
+      return (
+        <div className="flex flex-col gap-8 w-full">
+          <PixelRadioGroup
+            label="DIFFICULTY"
+            defaultValue="normal"
+            hint="Nightmare unlocks after one clear."
+            options={[
+              { value: "easy", label: "EASY" },
+              { value: "normal", label: "NORMAL" },
+              { value: "hard", label: "HARD" },
+              { value: "nightmare", label: "NIGHTMARE", disabled: true },
+            ]}
+          />
+          <PixelRadioGroup
+            label="HORIZONTAL"
+            orientation="horizontal"
+            defaultValue="b"
+            options={[
+              { value: "a", label: "1X" },
+              { value: "b", label: "2X" },
+              { value: "c", label: "4X" },
+            ]}
+          />
+        </div>
+      );
+    case "pixel-select":
+      return (
+        <div className="flex flex-col gap-4 max-w-sm w-full">
+          <PixelSelect
+            label="REGION"
+            defaultValue="eu"
+            options={[
+              { value: "na", label: "North America" },
+              { value: "eu", label: "Europe" },
+              { value: "jp", label: "Japan" },
+            ]}
+          />
+          <PixelSelect
+            label="PLACEHOLDER"
+            placeholder="Choose a region..."
+            defaultValue=""
+            hint="Sets your matchmaking pool."
+            options={[
+              { value: "na", label: "North America" },
+              { value: "eu", label: "Europe" },
+            ]}
+          />
+          <PixelSelect
+            label="ERROR STATE"
+            error="Region is required."
+            defaultValue=""
+            placeholder="Choose a region..."
+            options={[{ value: "na", label: "North America" }]}
+          />
         </div>
       );
     case "pixel-personality":

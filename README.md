@@ -94,6 +94,10 @@ All components — buttons, badges, highlights — will update automatically.
 | `PixelBadge`    | Inline badge with dot indicator option             |
 | `PixelWindow`   | Retro OS window with title bar and control dots   |
 | `PixelLoader`   | 4×4 grid diagonal-wave loading animation          |
+| `PixelToggle`   | Switch whose knob steps across the track          |
+| `PixelCheckbox` | Checkbox with a plotted pixel checkmark           |
+| `PixelRadioGroup` | Radio group; square-in-square selection         |
+| `PixelSelect`   | Native select with a stepped pixel caret          |
 
 ### Mascot
 
